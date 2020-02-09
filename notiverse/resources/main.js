@@ -774,8 +774,8 @@ var NotiVerse = function(){
 		tinymce.init({
 			selector: '#document',
 			language:'zh_CN',
-			language_url : '/resources/zh_CN.js',
-			external_plugins: {'mathjax': '/resources/mathjax/plugin.min.js'},
+			language_url : '/notiverse/resources/zh_CN.js',
+			external_plugins: {'mathjax': '/notiverse/resources/mathjax/plugin.min.js'},
 			plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave mathjax',
 			toolbar: 'code undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | table image media charmap mathjax emoticons hr pagebreak print preview',
 			height: 650,
@@ -785,7 +785,7 @@ var NotiVerse = function(){
 			autosave_ask_before_unload: false,
 			contextmenu: false,
 			toolbar_drawer : false,
-			content_css: '/resources/main.css',
+			content_css: '/notiverse/resources/main.css',
 			color_map: ["#ea6476","red-backcolor","#ea001f","red-forecolor","#ea9564","orange-backcolor","#ea5600","orange-forecolor","#ead864","yellow-backcolor","#eacb00","yellow-forecolor","#b9ea64","lime-backcolor","#94ea00","lime-forecolor","#76ea64","light-green-backcolor","#1fea00","light-green-forecolor","#64ea95","green-backcolor","#00ea56","green-forecolor","#64ead8","cyan-backcolor","#00eacb","cyan-forecolor","#64b9ea","light-blue-backcolor","#0094ea","light-blue-forecolor","#6476ea","blue-backcolor","#001fea","blue-forecolor","#9564ea","purple-backcolor","#5600ea","purple-forecolor","#d864ea","magenta-backcolor","#cb00ea","magenta-forecolor","#ea64b9","pink-backcolor","#ea0094","pink-forecolor"],
 			images_upload_handler: function(blobInfo, success, failure){
 				var reader = new FileReader();
@@ -799,7 +799,7 @@ var NotiVerse = function(){
 				}
 			},
 			mathjax: {
-				lib: '/resources/mathjax/es5/tex-mml-chtml.js'
+				lib: '/notiverse/resources/mathjax/es5/tex-mml-chtml.js'
 			},
 			init_instance_callback: function(editor){
 				_this._editor = editor;
