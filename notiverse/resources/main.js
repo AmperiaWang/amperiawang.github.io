@@ -775,6 +775,7 @@ var NotiVerse = function(){
 			selector: '#document',
 			language:'zh_CN',
 			language_url : './resources/zh_CN.js',
+			external_plugins: {'mathjax': './resources/mathjax/plugin.min.js'},
 			plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave mathjax',
 			toolbar: 'code undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | table image media charmap mathjax emoticons hr pagebreak print preview',
 			height: 650,
@@ -798,7 +799,7 @@ var NotiVerse = function(){
 				}
 			},
 			mathjax: {
-				lib: './resources/MathJax/es5/tex-mml-chtml.js'
+				lib: './resources/mathjax/es5/tex-mml-chtml.js'
 			},
 			init_instance_callback: function(editor){
 				_this._editor = editor;
