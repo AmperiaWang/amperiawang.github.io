@@ -699,6 +699,7 @@ var NotiVerse = function(){
 		}else{
 			_this._displayHistory();
 		}
+		_this._setToolBar();
 	};
 	this._displayHistory = function(arr){
 		arr = arr || [];
