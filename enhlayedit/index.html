@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>测试</title>
+	<link rel="stylesheet" type="text/css" href="./layui/css/layui.css">
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+	<script type="text/javascript" src="./layui/layui.js"></script>
+</head>
+<body>
+	<div id="layedit-demo"></div>
+	<script type="text/javascript">
+		var layedit, index;
+		layui.use('layedit', function(){
+			layedit = layui.layedit;
+			layedit.set({
+				tool: ['html', 'undo', 'redo', 'searchreplace', '|', 'strong', 'italic', 'underline', 'del', 'superscript', 'subscript', 'hr', 'removeformat', '|', 'left', 'center', 'right', 'formatblock', 'fontsize', 'fontcolor', 'backgroundcolor', '|', 'link', 'unlink', 'table', 'face', 'image', 'file', 'code']
+			});
+			index = layedit.build('layedit-demo');
+		});
+	</script>
+</body>
+</html>
