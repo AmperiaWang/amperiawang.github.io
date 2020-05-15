@@ -1,19 +1,334 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>测试</title>
+	<title>改进版layedit</title>
 	<link rel="stylesheet" type="text/css" href="./layui/css/layui.css">
 	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
 	<script type="text/javascript" src="./layui/layui.js"></script>
+	<link rel="icon" href="./icon.png" type="image/x-icon" />
+	<link rel="shortcut icon" href="./icon.png" type="image/x-icon"/>
+	<style type="text/css">
+		.header,.item-block{
+			margin: 2rem 0;
+		}
+
+		.header{
+			font-weight: 300;
+		}
+	</style>
 </head>
-<body>
-	<div id="layedit-demo"></div>
+<body class="layui">
+	<ul class="layui-nav" lay-filter="">
+		<li class="layui-nav-item"><a href="">改进版layedit</a></li>
+		<li class="layui-nav-item"><a href="https://www.layui.com/doc/modules/layedit.html">原版说明文档</a></li>
+		<li class="layui-nav-item"><a href="https://github.com/AmperiaWang/Enhanced-Layedit">GitHub仓库</a></li>
+		<li class="layui-nav-item"><a href="https://www.layui.com/">Layui官网</a></li>
+	</ul>
+	<div class="layui-container">
+		<h1 class="header">
+			<i class="layui-icon" style="font-size: inherit;"></i>
+			改进版layedit
+		</h1>
+		<blockquote class="layui-elem-quote layui-quote-nm item-block">
+			<p>作者（即layui作者）：贤心</p>
+			<p>修改者：安培利亚</p>
+			<p>使用方法：正常下载layui，并且替换原来的layedit.js即可。</p>
+		</blockquote>
+		<fieldset class="layui-elem-field layui-field-title">
+			<legend>较原版新增工具栏工具</legend>
+			<div class="layui-field-box">
+				<p>可通过在tool参数中添加相应的标签来添加对应的工具。</p>
+				<table class="layui-table">
+					<thead>
+						<tr>
+							<th>标签</th>
+							<th>工具名</th>
+							<th>功能</th>
+						</tr> 
+					</thead>
+					<tbody>
+						<tr>
+							<td>preview</td>
+							<td>预览</td>
+							<td>预览页面，可以在set()函数中传入renderer属性以自定义页面的渲染方式。</td>
+						</tr>
+						<tr>
+							<td>undo</td>
+							<td>撤销</td>
+							<td>撤销本次操作</td>
+						</tr>
+						<tr>
+							<td>redo</td>
+							<td>重做</td>
+							<td>如果之前有撤销操作，可以恢复。</td>
+						</tr>
+						<tr>
+							<td>selectall</td>
+							<td>全选</td>
+							<td>选择编辑区全部内容</td>
+						</tr>
+						<tr>
+							<td>searchreplace</td>
+							<td>查找与替换</td>
+							<td>可以查找页面内容并使用新的内容替换。</td>
+						</tr>
+						<tr>
+							<td>superscript</td>
+							<td>上标</td>
+							<td>将当前内容转为上标。</td>
+						</tr>
+						<tr>
+							<td>subscript</td>
+							<td>下标</td>
+							<td>将当前内容转为下标。</td>
+						</tr>
+						<tr>
+							<td>hr</td>
+							<td>水平分割线</td>
+							<td>在当前光标处插入水平分割线。</td>
+						</tr>
+						<tr>
+							<td>removeformat</td>
+							<td>清除格式</td>
+							<td>清除选择部分所有以CSS设定的格式。</td>
+						</tr>
+						<tr>
+							<td>ol</td>
+							<td>插入有序列表</td>
+							<td>在当前光标处插入有序列表。</td>
+						</tr>
+						<tr>
+							<td>ul</td>
+							<td>插入无序列表</td>
+							<td>在当前光标处插入无序列表。</td>
+						</tr>
+						<tr>
+							<td>formatblock</td>
+							<td>字体格式</td>
+							<td>可以设置当前所在块状元素的标签，如p，div等</td>
+						</tr>
+						<tr>
+							<td>fontsize</td>
+							<td>字体大小</td>
+							<td>可以设定字体大小。默认的字体大小选项有12px，14px，16px，20px，24px，28px，30px，36px，44px，52px，60px，66px。不过您也可以通过在set()函数中传入fontSizeOptions属性来自定义字体大小选项。具体传入方式见“set参数一览”部分。</td>
+						</tr>
+						<tr>
+							<td>fontcolor</td>
+							<td>字体颜色</td>
+							<td>可以设定字体颜色。可以通过传入fontColorOptions属性来自定义默认的字体颜色。</td>
+						</tr>
+						<tr>
+							<td>backgroundcolor</td>
+							<td>背景颜色</td>
+							<td>可以设定背景颜色。可以通过传入backgroundColorOptions属性来自定义默认的字体颜色。</td>
+						</tr>
+						<tr>
+							<td>table</td>
+							<td>表格</td>
+							<td>可以在非表格处添加表格，也可以在表格处设置光标所在的单元格。</td>
+						</tr>
+						<tr>
+							<td>file</td>
+							<td>添加附件</td>
+							<td>可以通过文件接口上传附件</td>
+						</tr>
+					</tbody>
+				</table>
+				<h2 class="header">全部工具一览</h2>
+				<pre class="layui-code">
+					layui.use('layedit', function(){
+						layedit = layui.layedit;
+						layedit.set({
+							tool: ['html', 'preview', 'undo', 'redo', 'searchreplace', '|', 'strong', 'italic', 'underline', 'del', 'superscript', 'subscript', 'hr', 'removeformat', '|', 'left', 'center', 'right', 'formatblock', 'fontsize', 'fontcolor', 'backgroundcolor', '|', 'ol', 'ul', 'link', 'unlink', 'table', 'face', 'image', 'file', 'code']
+						});
+						index = layedit.build('layedit-demo');
+					});
+				</pre>
+			</div>
+		</fieldset>
+		<fieldset class="layui-elem-field layui-field-title">
+			<legend>layedit.set()处的可自定义属性</legend>
+			<div class="layui-field-box">
+				<p>可通过在传入的参数中添加相应的属性来覆盖默认配置，达到自定义的效果。</p>
+				<table class="layui-table">
+					<thead>
+						<tr>
+							<th>键名</th>
+							<th>属性名</th>
+							<th>说明</th>
+						</tr> 
+					</thead>
+					<tbody>
+						<tr>
+							<td>formatBlockOptions</td>
+							<td>文字样式选项</td>
+							<td>可以自定义文字样式；是字典类型，键名为HTML标签，键值为对应在选择框中显示的标题。</td>
+						</tr>
+						<tr>
+							<td>fontSizeOptions</td>
+							<td>字体大小选项</td>
+							<td>可以自定义字体大小所对应的CSS属性，可用单位有px、pt、em等等，但建议用px（因为在不同的区块中其均会以px为单位显示）。是数组类型，每个元素是一个带有数字和单位的字符串。</td>
+						</tr>
+						<tr>
+							<td>fontColorOptions</td>
+							<td>文字颜色选项</td>
+							<td>可传入颜色的hex值或rgb值（写法与CSS样式相同）。是列表类型，每个元素是一个颜色值字符串。</td>
+						</tr>
+						<tr>
+							<td>backgroundColorOptions</td>
+							<td>背景颜色选项</td>
+							<td>可传入颜色的hex值或rgb值（写法与CSS样式相同）。是列表类型，每个元素是一个颜色值字符串。</td>
+						</tr>
+						<tr>
+							<td>previewRenderer</td>
+							<td>预览页面渲染器</td>
+							<td>可以提前渲染预览界面的内容。一般用于markdown等场合的编辑器作预览用。</td>
+						</tr>
+						<tr>
+							<td>contentCSS</td>
+							<td>编辑器引入CSS文件</td>
+							<td>是列表类型，每个元素是引入的CSS文件链接字符串。在编辑器生成时，这些CSS文件会适用于整个编辑器的界面。</td>
+						</tr>
+						<tr>
+							<td>customCSS</td>
+							<td>自定义CSS</td>
+							<td>是CSS字符串。在编辑器生成时，这些CSS字符串会被加在开头，适用于整个编辑器的界面。</td>
+						</tr>
+						<tr>
+							<td>previewCSS</td>
+							<td>预览界面引入CSS文件</td>
+							<td>是列表类型，每个元素是引入的CSS文件链接字符串。在预览界面打开时，这些CSS文件会适用于整个预览界面。</td>
+						</tr>
+						<tr>
+							<td>customBtn</td>
+							<td>用户自定义按钮</td>
+							<td>类型为字典，各键名为方法名，键值也为Object，其中icon属性和text属性均为给按钮设置图标/显示文字，title属性设置其标题，click属性为它被按下时的回调函数。</td>
+						</tr>
+					</tbody>
+				</table>
+				<h2 class="header">全部属性设置一览</h2>
+				<pre class="layui-code">
+					layui.use('layedit', function(){
+						layedit = layui.layedit;
+						layedit.set({
+							tool: ['html', 'preview', '|', 'strong', 'italic', 'underline', 'del', '|', 'left', 'center', 'right', 'fontsize', 'fontcolor', 'backgroundcolor', '|', 'link', 'unlink', 'table', 'face', 'image'],
+							customBtn: { //自定义按钮
+								'test':{
+									icon:'测试', //图标或文字
+									title:'测试一下', //鼠标移到元素上时会显示title
+									click:function(a,b){
+										console.log(a,b); //回调函数，第一个参数为iframe的window，另一个参数是当前的选区
+									}
+								}
+							},
+							formatBlockOptions: {
+								'h1':'标题1'
+								,'h2':'标题2'
+								,'h3':'标题3'
+								,'p':'段落'
+								,'div':'div区块'
+								,'blockquote':'引用'
+							}, //默认字体样式
+							fontSizeOptions: ['6px','8px','10px','12px','14px','16px','18px','20px','22px','24px','28px','30px','36px','44px','52px','60px','66px','72px'], 默认字体大小
+							fontColorOptions: ['#BC1717','#FF8D00','#FFBE00','#3FBE15','#0097EC','#141C8E','#7500B9','#FE3F85'], //默认字体颜色
+							backgroundColorOptions: ['#FF5D6C','#FF906D','#FFDA6C','#AEFF8C','#8CDEFF','#6976FF','#D087FF','#FF87CC'], //默认背景色
+							previewRenderer: function(html){ //预览渲染，参数为渲染前的HTML
+								return Mustache.render(html, {
+									id: 1,
+									name: '张三'
+								}); //返回渲染后的HTML
+							}
+							contentCSS: ['./layui/css/layui.css'], //CSS文件链接
+							previewCSS: ['./layui/css/layui.css'], //预览界面CSS文件链接
+							customCSS: 'html{margin:8px;}' //直接写入CSS
+							uploadImage: {
+								url: '', //接口URL
+								type: '', //默认为POST
+								done: function(res){
+									//处理后台返回的信息（JSON格式）
+								}
+							},
+							uploadFile: {
+								url: '', //接口URL
+								type: '', //默认为POST
+								done: function(res){
+									//处理后台返回的信息（JSON格式）
+								}
+							}
+						});
+						index = layedit.build('layedit-demo');
+					});
+				</pre>
+			</div>
+		</fieldset>
+		<fieldset class="layui-elem-field layui-field-title">
+			<legend>其余改动部分</legend>
+			<div class="layui-field-box">
+				<p>1. 上传图片和文件可通过done属性来自定义处理后台信息的函数。具体设置方法可参考上文。</p>
+				<p>2. 新增insertContent()方法，可以通过该函数在页面光标处插入文本信息。</p>
+			</div>
+		</fieldset>
+		<fieldset class="layui-elem-field layui-field-title">
+			<legend>示例</legend>
+			<div class="layui-field-box">
+				<div id="layedit-demo"></div>
+
+			</div>
+		</fieldset>
+	</div>
+	<hr>
+	<div class="layui-container" style="margin-top: 3rem;margin-bottom: 5rem;text-align: center;">
+		<h1 class="header">改进版layedit</h1>
+		<button class="layui-btn layui-btn-normal" onclick="window.open('https://github.com/AmperiaWang/Enhanced-Layedit/archive/master.zip')">现在下载</button>
+		<p class="item-block">需搭配Layui一起使用。<br>使用方法：替换原来的layedit.js即可。</p>
+	</div>
 	<script type="text/javascript">
 		var layedit, index;
-		layui.use('layedit', function(){
+		layui.use(['element','layedit','code'], function(){
+			layui.code();
 			layedit = layui.layedit;
 			layedit.set({
-				tool: ['html', 'undo', 'redo', 'searchreplace', '|', 'strong', 'italic', 'underline', 'del', 'superscript', 'subscript', 'hr', 'removeformat', '|', 'left', 'center', 'right', 'formatblock', 'fontsize', 'fontcolor', 'backgroundcolor', '|', 'link', 'unlink', 'table', 'face', 'image', 'file', 'code']
+				tool: ['html', 'preview', 'undo', 'redo', 'searchreplace', '|', 'strong', 'italic', 'underline', 'del', 'superscript', 'subscript', 'hr', 'removeformat', '|', 'left', 'center', 'right', 'formatblock', 'fontsize', 'fontcolor', 'backgroundcolor', '|', 'ol', 'ul', 'link', 'unlink', 'table', 'face', 'image', 'file', 'code', '|', 'test'],
+				customBtn: {
+					'test':{
+						icon:'测试',
+						title:'测试一下',
+						click:function(a,b){
+							console.log(a,b);
+						}
+					}
+				},
+				formatBlockOptions: {
+					'h1':'标题1'
+					,'h2':'标题2'
+					,'h3':'标题3'
+					,'p':'段落'
+					,'div':'div区块'
+					,'blockquote':'引用'
+				},
+				fontSizeOptions: ['6px','8px','10px','12px','14px','16px','18px','20px','22px','24px','28px','30px','36px','44px','52px','60px','66px','72px'],
+				fontColorOptions: ['#BC1717','#FF8D00','#FFBE00','#3FBE15','#0097EC','#141C8E','#7500B9','#FE3F85'],
+				backgroundColorOptions: ['#FF5D6C','#FF906D','#FFDA6C','#AEFF8C','#8CDEFF','#6976FF','#D087FF','#FF87CC'],
+				previewRenderer: function(html){
+					return Mustache.render(html, {
+						id: 1,
+						name: '张三'
+					})
+				},
+				uploadImage: {
+					url: '',
+					type: '',
+					done: function(res){
+						console.log(res);
+					}
+				},
+				uploadFile: {
+					url: '',
+					type: '',
+					done: function(res){
+						console.log(res);
+					}
+				}
 			});
 			index = layedit.build('layedit-demo');
 		});
