@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
+        integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="mdui-theme-primary-green mdui-theme-accent-teal">
+        <div class="mdui-toolbar mdui-color-theme">
+            <a href="/" class="mdui-btn mdui-btn-icon">
+                <i class="mdui-icon material-icons">home</i>
+            </a>
+            <a href="javascript:void(0);" class="mdui-typo-title">{{title}}</a>
+            <div class="mdui-toolbar-spacer"></div>
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+                <i class="mdui-icon material-icons">search</i>
+            </a>
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+                <i class="mdui-icon material-icons">refresh</i>
+            </a>
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+                <i class="mdui-icon material-icons">more_vert</i>
+            </a>
+        </div>
+    </div>
+
+    <div class="mdui-container">
+        <div class="mdui-typo">
+            {{content}}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"
+        integrity="sha384-gCMZcshYKOGRX9r6wbDrvF+TcCCswSHFucUzUPwka+Gr+uHgjlYvkABr95TCOz3A"
+        crossorigin="anonymous"></script>
+
+    <script>
+        function comingSoon() {
+            mdui.snackbar("敬请期待");
+        }
+
+        var inst = new mdui.Tab("#appbar-tab");
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']]
+            }
+        };
+
+        document.onreadystatechange = function(e) {
+            let elList = document.querySelectorAll("table");
+            console.log(elList);
+            for(let idx = 0; idx < elList.length; idx++) {
+                console.log(elList[idx])
+                elList[idx].setAttribute('class', 'mdui-table');
+            }
+
+            mdui.mutation();
+        }
+    </script>
+    <script id="MathJax-script" async src="https://cdn.bootcss.com/mathjax/3.0.5/es5/tex-mml-chtml.js"></script>
+</body>
+
+</html>
