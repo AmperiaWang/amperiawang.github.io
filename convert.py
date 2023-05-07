@@ -8,13 +8,23 @@ import shutil
 
 
 def createNote(data, template):
+    formula = re.findall(r"\$\$?[^\n$]+\$\$?", data)
+    for f in range(len(formula)):
+        data = data.replace(formula[f], "{{$%d}}" % (f,))
+    coverRes = re.search(r"!\[[^\]]+\]\(([^\)]+)\)", data)
+    cover = "/assets/homepage_banner.jpg"
+    if coverRes is not None:
+        cover = coverRes.group(1)
     content = markdown.markdown(data, extensions=[
                                 'markdown.extensions.toc', 'markdown.extensions.fenced_code', 'markdown.extensions.tables'])
+    for f in range(len(formula)):
+        fitem = formula[f].replace("<", "&lt;").replace(">", "&gt;")
+        content = content.replace("{{$%d}}" % (f,), fitem)
     titleRes = re.search(r">([^<]+)<", content)
     title = ""
     if titleRes is not None:
         title = titleRes.group(1)
-    res = template.replace("{{content}}", content).replace("{{title}}", title)
+    res = template.replace("{{content}}", content).replace("{{title}}", title).replace("{{cover}}", cover)
 
     return res
 

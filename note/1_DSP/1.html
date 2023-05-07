@@ -9,22 +9,28 @@
 </head>
 
 <body>
-    <div class="mdui-theme-primary-green mdui-theme-accent-teal">
+    <div class="mdui-theme-primary-light-green mdui-theme-accent-lime">
         <div class="mdui-toolbar mdui-color-theme">
-            <a href="/" class="mdui-btn mdui-btn-icon">
+            <a href="/" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '主页'}">
                 <i class="mdui-icon material-icons">home</i>
             </a>
             <a href="javascript:void(0);" class="mdui-typo-title">1 傅里叶变换、拉普拉斯变换和z变换</a>
             <div class="mdui-toolbar-spacer"></div>
-            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '搜索'}">
                 <i class="mdui-icon material-icons">search</i>
             </a>
-            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '刷新'}">
                 <i class="mdui-icon material-icons">refresh</i>
             </a>
-            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '更多'}">
                 <i class="mdui-icon material-icons">more_vert</i>
             </a>
+        </div>
+    </div>
+
+    <div class="banner" style="position: relative; width: 100vw; height: 30vh;">
+        <img src="./assets/1-1.png" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+        <div class="cover" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);">
         </div>
     </div>
 
@@ -39,7 +45,7 @@
 <p>其中：</p>
 <p>$$a_{n}=\frac{2}{T_{0}}\int_{-\frac{T_0}{2}}^{\frac{T_0}{2}}{x(t)cos(nΩ_{0}t)dt}$$</p>
 <p>$$b_{n}=\frac{2}{T_{0}}\int_{-\frac{T_0}{2}}^{\frac{T_0}{2}}{x(t)sin(nΩ_{0}t)dt}$$</p>
-<p>我们知道复数的表示法$e^{jω}=cos(ω)+jsin(w)$，因此合并$X(t)$中各项可得</p>
+<p>我们知道复数的表示法$e^{jω}=cos(ω)+jsin(ω)$，因此合并$X(t)$中各项可得</p>
 <p>$$x(t)=\sum_{n=-∞}^{n=∞}{c_{n}e^{jnΩ_{0}t}}$$</p>
 <p>其中$c_{n}=\frac{a{n}-jb_{n}}{2}$，其共轭$c_{n}^{*}=\frac{a{n}+jb_{n}}{2}$。</p>
 <p>这是傅里叶变换关于时域的表达式。借助傅里叶变换，可以实现时域与频域的相互转化。傅里叶变换关于频域的表达式为</p>
@@ -83,19 +89,19 @@
 <p>$$\int_{-∞}^{t}{x(τ)dτ}⇔πX(0)δ(Ω)+\frac{1}{jΩ}X(jΩ)$$</p>
 <p>$$πx(0)δ(t)-\frac{1}{jt}x(t)⇔\int_{-∞}^{Ω}{X(jω)dω}$$</p>
 <h2 id="13">1.3 卷积与傅里叶变换</h2>
-<p>我们可以将一段序列${(u,v)}$用函数表示为$v=f(u)$，此时若想知道序列中某个元素$(u_{0},v_{0})$及其相邻元素之间的综合信息（相关关系等），就会将它和与它相邻的元素进行相乘后求和的操作。我们将这个操作叫做<strong>卷积</strong>。卷积的更直观形象的讲述可以参见<a href="https://www.bilibili.com/video/BV1Vd4y1e7pj">【官方双语】那么……什么是卷积？ - 3Blue1Brown</a>。</p>
+<p>我们可以将一段序列$\{(u,v)\}$用函数表示为$v=f(u)$，此时若想知道序列中某个元素$(u_{0},v_{0})$及其相邻元素之间的综合信息（相关关系等），就会将它和与它相邻的元素进行相乘后求和的操作。我们将这个操作叫做<strong>卷积</strong>。卷积的更直观形象的讲述可以参见<a href="https://www.bilibili.com/video/BV1Vd4y1e7pj">【官方双语】那么……什么是卷积？ - 3Blue1Brown</a>。</p>
 <p><img alt="可以通过卷积获取自身及相邻元素之间的综合信息" src="assets/1-2.png" /></p>
 <p>连续序列的卷积（卷积核$h(t)$也连续）用数学公式定义如下：</p>
 <p>$$y(t)=\int_{-∞}^{+∞}{x(τ)h(t-τ)dτ}=(x*h)(t)$$</p>
 <p>卷积运算满足交换律：</p>
-<p>$$(x<em>h)(t)=(h</em>x)(t)$$</p>
+<p>$$(x*h)(t)=(h*x)(t)$$</p>
 <p>将卷积与傅里叶变换结合起来，我们可以发现：</p>
 <p>（1）时域上的卷积操作可转化为频域上的相乘操作</p>
 <p>$$(x*h)(t)⇔X(jΩ)H(jΩ)$$</p>
 <p>（2）频域上的卷积操作可转化为时域上的相乘操作</p>
 <p>$$2πh(t)x(t)⇔(H*X)(jΩ)$$</p>
 <h2 id="14">1.4 拉普拉斯变换</h2>
-<p>傅里叶变换中的参变量仅为纯虚数$jΩ$，将参变量扩展至整个复数域${s}$，可以得到拉普拉斯变换</p>
+<p>傅里叶变换中的参变量仅为纯虚数$jΩ$，将参变量扩展至整个复数域$\{s\}$，可以得到拉普拉斯变换</p>
 <p>$$X(s)=\int_{0}^{+∞}x(t)e^{-st}dt$$</p>
 <p>简记为$X(s)=\mathcal{L}[x(t)]$。</p>
 <p>拉普拉斯变换具有的性质为：</p>
@@ -118,7 +124,7 @@
 <p>（8）相似性质</p>
 <p>$$\mathcal{L}[x(at)]=\frac{1}{a}X(\frac{s}{a})$$</p>
 <p>（9）拉普拉斯变换的卷积定理</p>
-<p>$$\mathcal{L}[(x<em>y)(t)]=X(s)Y(s),\mathcal{L}^{-1}[X(s)Y(s)]=(x</em>y)(t)$$</p>
+<p>$$\mathcal{L}[(x*y)(t)]=X(s)Y(s),\mathcal{L}^{-1}[X(s)Y(s)]=(x*y)(t)$$</p>
 <p>常见函数的拉普拉斯变换表如下所示：</p>
 <table>
 <thead>
@@ -242,7 +248,7 @@
 <p>（5）频率移位</p>
 <p>$$x(n)e^{jω_{0}n}⇔X(e^{j(w-w_{0})})$$</p>
 <p>（6）共轭</p>
-<p>$$x^{<em>}(n)⇔X^{</em>}(e^{jω})$$</p>
+<p>$$x^{*}(n)⇔X^{*}(e^{jω})$$</p>
 <p>（7）反转</p>
 <p>$$x(-n)⇔X(e^{-jω})$$</p>
 <p>（8）卷积</p>
@@ -281,7 +287,7 @@
 <table>
 <thead>
 <tr>
-<th style="text-align: center;">$n_{1}$\$n_{2}$</th>
+<th style="text-align: center;">$n_{1}$\\$n_{2}$</th>
 <th style="text-align: center;">$(-∞,0]$</th>
 <th style="text-align: center;">$(0,+∞)$</th>
 <th style="text-align: center;">$+∞$</th>
@@ -290,21 +296,21 @@
 <tbody>
 <tr>
 <td style="text-align: center;">$-∞$</td>
-<td style="text-align: center;">$|z|&lt;R_{x^{+}}$</td>
-<td style="text-align: center;">$0&lt;|z|&lt;R_{x^{+}}$</td>
-<td style="text-align: center;">$R_{x^{-}}&lt;|z|&lt;R_{x^{+}}$</td>
+<td style="text-align: center;">$\|z\|&lt;R_{x^{+}}$</td>
+<td style="text-align: center;">$0&lt;\|z\|&lt;R_{x^{+}}$</td>
+<td style="text-align: center;">$R_{x^{-}}&lt;\|z\|&lt;R_{x^{+}}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">$(-∞,0)$</td>
-<td style="text-align: center;">$|z|&lt;+∞$</td>
-<td style="text-align: center;">$0&lt;|z|&lt;+∞$</td>
-<td style="text-align: center;">$R_{x^{-}}&lt;|z|&lt;+∞$</td>
+<td style="text-align: center;">$\|z\|&lt;+∞$</td>
+<td style="text-align: center;">$0&lt;\|z\|&lt;+∞$</td>
+<td style="text-align: center;">$R_{x^{-}}&lt;\|z\|&lt;+∞$</td>
 </tr>
 <tr>
 <td style="text-align: center;">$[0,+∞)$</td>
 <td style="text-align: center;">整个z平面</td>
-<td style="text-align: center;">$|z|&gt;0$</td>
-<td style="text-align: center;">$|z|&gt;R_{x^{-}}$</td>
+<td style="text-align: center;">$\|z\|&gt;0$</td>
+<td style="text-align: center;">$\|z\|&gt;R_{x^{-}}$</td>
 </tr>
 </tbody>
 </table>
@@ -326,52 +332,52 @@
 <tr>
 <td>阶跃函数$u(n)$</td>
 <td>$\frac{1}{1-z^{-1}}$</td>
-<td>$|z|&gt;1$</td>
+<td>$\|z\|&gt;1$</td>
 </tr>
 <tr>
 <td>$-u(-n-1)$</td>
 <td>$\frac{1}{1-z^{-1}}$</td>
-<td>$|z|&lt;1$</td>
+<td>$\|z\|&lt;1$</td>
 </tr>
 <tr>
 <td>$a^{n}u(n)$</td>
 <td>$\frac{1}{1-az^{-1}}$</td>
-<td>$|z|&gt;a$</td>
+<td>$\|z\|&gt;a$</td>
 </tr>
 <tr>
 <td>$nu(n)$</td>
 <td>$\frac{z^{-1}}{(1-z^{-1})^{2}}$</td>
-<td>$|z|&gt;1$</td>
+<td>$\|z\|&gt;1$</td>
 </tr>
 <tr>
 <td>$e^{-an}u(n)$</td>
 <td>$\frac{1}{1-e^{-a}z^{-1}}$</td>
-<td>$|z|&gt;e^{-a}$</td>
+<td>$\|z\|&gt;e^{-a}$</td>
 </tr>
 <tr>
 <td>$ne^{-an}u(n)$</td>
 <td>$\frac{e^{-a}z^{-1}}{(1-e^{-a}z^{-1})^{2}}$</td>
-<td>$|z|&gt;e^{-a}$</td>
+<td>$\|z\|&gt;e^{-a}$</td>
 </tr>
 <tr>
 <td>$sin(ω_{0}n)u(n)$</td>
 <td>$\frac{z^{-1}sinω_{0}}{1-2z^{-1}cosω_{0}+z^{-2}}$</td>
-<td>$|z|&gt;1$</td>
+<td>$\|z\|&gt;1$</td>
 </tr>
 <tr>
 <td>$cos(ω_{0}n)u(n)$</td>
 <td>$\frac{1-z^{-1}cosω_{0}}{1-2z^{-1}cosω_{0}+z^{-2}}$</td>
-<td>$|z|&gt;1$</td>
+<td>$\|z\|&gt;1$</td>
 </tr>
 <tr>
 <td>$e^{-an}sin(ω_{0}n)u(n)$</td>
 <td>$\frac{z^{-1}e^{-a}sinω_{0}}{1-2z^{-1}e^{-a}cosω_{0}+z^{-2}e^{-2a}}$</td>
-<td>$|z|&gt;e^{-a}$</td>
+<td>$\|z\|&gt;e^{-a}$</td>
 </tr>
 <tr>
 <td>$e^{-an}cos(ω_{0}n)u(n)$</td>
 <td>$\frac{1-z^{-1}e^{-a}cosω_{0}}{1-2z^{-1}e^{-a}cosω_{0}+z^{-2}e^{-2a}}$</td>
-<td>$|z|&gt;e^{-a}$</td>
+<td>$\|z\|&gt;e^{-a}$</td>
 </tr>
 </tbody>
 </table>
@@ -390,61 +396,61 @@
 <td style="text-align: center;">线性</td>
 <td style="text-align: center;">$ax(n)+by(n)$</td>
 <td style="text-align: center;">$aX(z)+bY(z)$</td>
-<td style="text-align: center;">$max{R_{x^{-}},R_{y^{-}}}&lt;|z|&lt;min{R_{x^{+}},R_{y^{+}}}$</td>
+<td style="text-align: center;">$max\{R_{x^{-}},R_{y^{-}}\}&lt;\|z\|&lt;min\{R_{x^{+}},R_{y^{+}}\}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">移位</td>
 <td style="text-align: center;">$x(n-n_{0})$</td>
 <td style="text-align: center;">$z^{-n_{0}}X(z)$</td>
-<td style="text-align: center;">$R_{x^{-}}&lt;|z|&lt;R_{x^{+}}$</td>
+<td style="text-align: center;">$R_{x^{-}}&lt;\|z\|&lt;R_{x^{+}}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">线性加权</td>
 <td style="text-align: center;">$nx(n)$</td>
 <td style="text-align: center;">$-z\frac{dX(z)}{dz}$</td>
-<td style="text-align: center;">$R_{x^{-}}&lt;|z|&lt;R_{x^{+}}$</td>
+<td style="text-align: center;">$R_{x^{-}}&lt;\|z\|&lt;R_{x^{+}}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">指数加权</td>
 <td style="text-align: center;">$a^{n}x(n)$</td>
 <td style="text-align: center;">$X(a^{-1}z)$</td>
-<td style="text-align: center;">$|a|R_{x^{-}}&lt;|z|&lt;|a|R_{x^{+}}$</td>
+<td style="text-align: center;">$\|a\|R_{x^{-}}&lt;\|z\|&lt;\|a\|R_{x^{+}}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">共轭</td>
 <td style="text-align: center;">$x^{*}(n)$</td>
-<td style="text-align: center;">$X^{<em>}(z^{</em>})$</td>
-<td style="text-align: center;">$R_{x^{-}}&lt;|z|&lt;R_{x^{+}}$</td>
+<td style="text-align: center;">$X^{*}(z^{*})$</td>
+<td style="text-align: center;">$R_{x^{-}}&lt;\|z\|&lt;R_{x^{+}}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">翻转</td>
 <td style="text-align: center;">$x(-n)$</td>
 <td style="text-align: center;">$X(z^{-1})$</td>
-<td style="text-align: center;">$\frac{1}{R_{x^{+}}}&lt;|z|&lt;\frac{1}{R_{x^{-}}}$</td>
+<td style="text-align: center;">$\frac{1}{R_{x^{+}}}&lt;\|z\|&lt;\frac{1}{R_{x^{-}}}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">实部</td>
 <td style="text-align: center;">$Re[x(n)]$</td>
-<td style="text-align: center;">$\frac{1}{2}[X(z)+X^{<em>}(z^{</em>})]$</td>
-<td style="text-align: center;">$R_{x^{-}}&lt;|z|&lt;R_{x^{+}}$</td>
+<td style="text-align: center;">$\frac{1}{2}[X(z)+X^{*}(z^{*})]$</td>
+<td style="text-align: center;">$R_{x^{-}}&lt;\|z\|&lt;R_{x^{+}}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">虚部</td>
 <td style="text-align: center;">$Im[x(n)]$</td>
-<td style="text-align: center;">$\frac{1}{2j}[X(z)-X^{<em>}(z^{</em>})]$</td>
-<td style="text-align: center;">$R_{x^{-}}&lt;|z|&lt;R_{x^{+}}$</td>
+<td style="text-align: center;">$\frac{1}{2j}[X(z)-X^{*}(z^{*})]$</td>
+<td style="text-align: center;">$R_{x^{-}}&lt;\|z\|&lt;R_{x^{+}}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">卷积定理</td>
 <td style="text-align: center;">$(x*y)(n)$</td>
 <td style="text-align: center;">$X(z)Y(z)$</td>
-<td style="text-align: center;">$max{R_{x^{-}},R_{y^{-}}}&lt;|z|&lt;min{R_{x^{+}},R_{y^{+}}}$</td>
+<td style="text-align: center;">$max\{R_{x^{-}},R_{y^{-}}\}&lt;\|z\|&lt;min\{R_{x^{+}},R_{y^{+}}\}$</td>
 </tr>
 <tr>
 <td style="text-align: center;">复卷积定理</td>
 <td style="text-align: center;">$x(n)y(n)$</td>
 <td style="text-align: center;">$\frac{1}{2πj}\oint_{c}{X(\frac{z}{v})Y(v)v^{-1}dv}$</td>
-<td style="text-align: center;">$R_{x^{-}}R_{y^{-}}&lt;|z|&lt;R_{x^{+}}R_{y^{+}}$</td>
+<td style="text-align: center;">$R_{x^{-}}R_{y^{-}}&lt;\|z\|&lt;R_{x^{+}}R_{y^{+}}$</td>
 </tr>
 </tbody>
 </table>
@@ -484,10 +490,10 @@
             }
         };
 
-        document.onreadystatechange = function(e) {
+        document.onreadystatechange = function (e) {
             let elList = document.querySelectorAll("table");
             console.log(elList);
-            for(let idx = 0; idx < elList.length; idx++) {
+            for (let idx = 0; idx < elList.length; idx++) {
                 console.log(elList[idx])
                 elList[idx].setAttribute('class', 'mdui-table');
             }

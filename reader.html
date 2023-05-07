@@ -9,22 +9,28 @@
 </head>
 
 <body>
-    <div class="mdui-theme-primary-green mdui-theme-accent-teal">
+    <div class="mdui-theme-primary-light-green mdui-theme-accent-lime">
         <div class="mdui-toolbar mdui-color-theme">
-            <a href="/" class="mdui-btn mdui-btn-icon">
+            <a href="/" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '主页'}">
                 <i class="mdui-icon material-icons">home</i>
             </a>
             <a href="javascript:void(0);" class="mdui-typo-title">{{title}}</a>
             <div class="mdui-toolbar-spacer"></div>
-            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '搜索'}">
                 <i class="mdui-icon material-icons">search</i>
             </a>
-            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '刷新'}">
                 <i class="mdui-icon material-icons">refresh</i>
             </a>
-            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon">
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '更多'}">
                 <i class="mdui-icon material-icons">more_vert</i>
             </a>
+        </div>
+    </div>
+
+    <div class="banner" style="position: relative; width: 100vw; height: 30vh;">
+        <img src="{{cover}}" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+        <div class="cover" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);">
         </div>
     </div>
 
@@ -50,10 +56,10 @@
             }
         };
 
-        document.onreadystatechange = function(e) {
+        document.onreadystatechange = function (e) {
             let elList = document.querySelectorAll("table");
             console.log(elList);
-            for(let idx = 0; idx < elList.length; idx++) {
+            for (let idx = 0; idx < elList.length; idx++) {
                 console.log(elList[idx])
                 elList[idx].setAttribute('class', 'mdui-table');
             }
