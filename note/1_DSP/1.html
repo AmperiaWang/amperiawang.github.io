@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <div class="mdui-container">
+    <div class="mdui-container" style="padding: 2rem 0;">
         <div class="mdui-typo">
             <h1 id="1-z">1 傅里叶变换、拉普拉斯变换和z变换</h1>
 <h2 id="11">1.1 什么是傅里叶变换</h2>
@@ -474,6 +474,13 @@
         </div>
     </div>
 
+    <div id="footer" style="padding: 2rem 0;">
+        <div class="mdui-text-center mdui-text-color-grey">
+            @AmperiaWang
+            <span id="footer-year"></span>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"
         integrity="sha384-gCMZcshYKOGRX9r6wbDrvF+TcCCswSHFucUzUPwka+Gr+uHgjlYvkABr95TCOz3A"
         crossorigin="anonymous"></script>
@@ -497,6 +504,9 @@
                 console.log(elList[idx])
                 elList[idx].setAttribute('class', 'mdui-table');
             }
+
+            let footerYear = document.getElementById("footer-year");
+            footerYear.innerHTML = (new Date()).getFullYear();
 
             mdui.mutation();
         }
