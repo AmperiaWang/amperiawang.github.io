@@ -35,7 +35,7 @@
     </div>
 
     <div class="mdui-container" style="padding: 2rem 0;">
-        <div class="mdui-typo">
+        <div id="content" class="mdui-typo">
             {{content}}
         </div>
     </div>
@@ -56,23 +56,52 @@
             mdui.snackbar("敬请期待");
         }
 
+        function formatContent(node) {
+            let len = node.childNodes.length;
+            if (!len) {
+                return;
+            }
+            for (let idx = 0; idx < len; idx++) {
+                let el = node.childNodes[idx];
+                let elTag = el.nodeName.toLowerCase();
+                if (elTag == "img") {
+                    if(node.className == "mdui-text-center") {
+                        break;
+                    }
+                    node.setAttribute("class", "mdui-text-center");
+                    let imageDescription = document.createElement("div");
+                    imageDescription.setAttribute("class", "description mdui-text-color-grey mdui-typo-caption");
+                    imageDescription.innerHTML = "图<span class='image-index'></span>&nbsp;&nbsp;" + el.alt;
+                    el.outerHTML = el.outerHTML + imageDescription.outerHTML;
+                    len++;
+                    idx++;
+                }
+                if (elTag == "table") {
+                    el.setAttribute("class", "mdui-table");
+                }
+                formatContent(el);
+            }
+        }
+
         var inst = new mdui.Tab("#appbar-tab");
         MathJax = {
             tex: {
-                inlineMath: [['$', '$']]
+                inlineMath: [["$", "$"]]
             }
         };
 
         document.onreadystatechange = function (e) {
-            let elList = document.querySelectorAll("table");
-            console.log(elList);
-            for (let idx = 0; idx < elList.length; idx++) {
-                console.log(elList[idx])
-                elList[idx].setAttribute('class', 'mdui-table');
-            }
-
             let footerYear = document.getElementById("footer-year");
             footerYear.innerHTML = (new Date()).getFullYear();
+
+            let content = document.getElementById("content");
+
+            formatContent(content);
+
+            let indices = document.getElementsByClassName("image-index");
+            for (let idx = 0; idx < indices.length; idx++) {
+                indices[idx].innerHTML = (idx + 1);
+            }
 
             mdui.mutation();
         }

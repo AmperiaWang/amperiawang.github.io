@@ -6,9 +6,26 @@ import markdown
 import string
 import shutil
 
+def formulaEscape(formula):
+    table = {
+        "α": "\\alpha", "β": "\\beta", "Γ": "\\Gamma", "γ": "\\gamma",
+        "Δ": "\\Delta", "δ": "\\delta", "ε": "\\varepsilon", "ζ": "\\zeta",
+        "η": "\\eta", "Θ": "\\Theta", "θ": "\\theta", "ι": "\\iota",
+        "κ": "\\kappa", "Λ": "\\Lambda", "λ": "\\lambda", "μ": "\\mu",
+        "ν": "\\nu", "Ξ": "\\Xi", "ξ": "\\xi", "ο": "\\omicron",
+        "Π": "\\Pi", "π": "\\pi", "ρ": "\\rho", "Σ": "\\Sigma",
+        "σ": "\\sigma", "τ": "\\tau", "Υ": "\\Upsilon", "υ": "\\upsilon",
+        "Φ": "\\Phi", "ϕ": "\\phi", "χ": "\\chi", "Ψ": "\\Psi",
+        "ψ": "\\psi", "Ω": "\\Omega", "ω": "\\omega", "<": "&lt;",
+        ">": "&gt;"
+    }
+    for alphabet in table:
+        formula = formula.replace(alphabet, table[alphabet] + " ")
+    return formula
 
 def createNote(data, template):
-    formula = re.findall(r"\$\$?[^\n$]+\$\$?", data)
+    formula = re.findall(r"\$\$?[^$]+\$\$?", data)
+    [print(f) for f in formula]
     for f in range(len(formula)):
         data = data.replace(formula[f], "{{$%d}}" % (f,))
     coverRes = re.search(r"!\[[^\]]+\]\(([^\)]+)\)", data)
@@ -16,10 +33,9 @@ def createNote(data, template):
     if coverRes is not None:
         cover = coverRes.group(1)
     content = markdown.markdown(data, extensions=[
-                                'markdown.extensions.toc', 'markdown.extensions.fenced_code', 'markdown.extensions.tables'])
+                                "markdown.extensions.toc", "markdown.extensions.fenced_code", "markdown.extensions.tables"])
     for f in range(len(formula)):
-        fitem = formula[f].replace("<", "&lt;").replace(">", "&gt;")
-        content = content.replace("{{$%d}}" % (f,), fitem)
+        content = content.replace("{{$%d}}" % (f,), formulaEscape(formula[f]))
     titleRes = re.search(r">([^<]+)<", content)
     title = ""
     if titleRes is not None:
