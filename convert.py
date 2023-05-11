@@ -25,7 +25,6 @@ def formulaEscape(formula):
 
 def createNote(data, template):
     formula = re.findall(r"\$\$?[^$]+\$\$?", data)
-    [print(f) for f in formula]
     for f in range(len(formula)):
         data = data.replace(formula[f], "{{$%d}}" % (f,))
     coverRes = re.search(r"!\[[^\]]+\]\(([^\)]+)\)", data)
