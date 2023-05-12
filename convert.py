@@ -2,6 +2,7 @@
 import os
 import sys
 import re
+import json
 import markdown
 import string
 import shutil
@@ -15,9 +16,9 @@ def formulaEscape(formula):
         "ν": "\\nu", "Ξ": "\\Xi", "ξ": "\\xi", "ο": "\\omicron",
         "Π": "\\Pi", "π": "\\pi", "ρ": "\\rho", "Σ": "\\Sigma",
         "σ": "\\sigma", "τ": "\\tau", "Υ": "\\Upsilon", "υ": "\\upsilon",
-        "Φ": "\\Phi", "ϕ": "\\phi", "χ": "\\chi", "Ψ": "\\Psi",
-        "ψ": "\\psi", "Ω": "\\Omega", "ω": "\\omega", "<": "&lt;",
-        ">": "&gt;"
+        "Φ": "\\Phi", "φ": "\\varphi", "ϕ": "\\varphi", "χ": "\\chi",
+        "Ψ": "\\Psi", "ψ": "\\psi", "Ω": "\\Omega", "ω": "\\omega",
+        "<": "&lt;", ">": "&gt;"
     }
     for alphabet in table:
         formula = formula.replace(alphabet, table[alphabet] + " ")
@@ -40,17 +41,18 @@ def createNote(data, template):
     if titleRes is not None:
         title = titleRes.group(1)
     res = template.replace("{{content}}", content).replace("{{title}}", title).replace("{{cover}}", cover)
-
-    return res
+    return res, title
 
 
 def convert(source, dest, path, template):
     subPathList = os.listdir(source + path)
     for fileName in subPathList:
+        menu = []
         if os.path.isfile(source + path + fileName):
             if fileName.endswith(".md"):
                 with open(source + path + fileName, "r", encoding="utf-8") as f:
-                    s = createNote(f.read(), template)
+                    s, title = createNote(f.read(), template)
+                    menu.append([fileName.replace(".md", ""), title])
                 with open(dest + path + fileName.replace(".md", ".html"), "w", encoding="utf-8") as f:
                     f.write(s)
             else:

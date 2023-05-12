@@ -353,7 +353,7 @@ cv2.imwrite(&quot;out.jpg&quot;, 20 * np.log(np.abs(fftshifted)))
 <p><img alt="输入示意图" src="./assets/2-6.png" /></p>
 <p>输出图片FFT图如下：</p>
 <p><img alt="输出示意图" src="./assets/2-7.png" /></p>
-<p>可将该图理解为图像的幅频特性与相频特性。我们都知道，单个正弦波的函数为$\Phi (x)=A(\omega x+φ)$，因此，一个波可以用$\{A,\omega ,φ\}$三个值来表示。将这张图想象为一个极坐标系$y=f(\rho ,\theta )$，其中可以由点$(\rho ,\theta )$确定该点的亮度$y$。在图片的FFT图中，其对应关系分别为$y=A,\rho =\omega ,\theta =φ$。图像中央为低频正弦波的幅值，外围为高频正弦波的幅值。因此，可以通过施加遮罩来实现低通/高通滤波器的效果。</p>
+<p>可将该图理解为图像的幅频特性与相频特性。我们都知道，单个正弦波的函数为$\Phi (x)=A(\omega x+\varphi )$，因此，一个波可以用$\{A,\omega ,\varphi \}$三个值来表示。将这张图想象为一个极坐标系$y=f(\rho ,\theta )$，其中可以由点$(\rho ,\theta )$确定该点的亮度$y$。在图片的FFT图中，其对应关系分别为$y=A,\rho =\omega ,\theta =\varphi $。图像中央为低频正弦波的幅值，外围为高频正弦波的幅值。因此，可以通过施加遮罩来实现低通/高通滤波器的效果。</p>
 <p><img alt="低通滤波器示意图" src="./assets/2-8.png" /></p>
 <p><img alt="高通滤波器示意图" src="./assets/2-9.jpg" /></p>
 <p>再次回顾下快速傅里叶变换与其反变换：</p>
