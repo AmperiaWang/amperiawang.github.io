@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SNN知识体系</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
+        integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="mdui-theme-primary-light-green mdui-theme-accent-lime">
+        <div class="mdui-toolbar mdui-color-theme">
+            <a href="/" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '主页'}">
+                <i class="mdui-icon material-icons">home</i>
+            </a>
+            <a href="javascript:void(0);" class="mdui-typo-title">SNN知识体系</a>
+            <div class="mdui-toolbar-spacer"></div>
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '搜索'}">
+                <i class="mdui-icon material-icons">search</i>
+            </a>
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '刷新'}">
+                <i class="mdui-icon material-icons">refresh</i>
+            </a>
+            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '更多'}">
+                <i class="mdui-icon material-icons">more_vert</i>
+            </a>
+        </div>
+    </div>
+
+    <div class="banner" style="position: relative; width: 100%; height: 30vh;">
+        <img src="/assets/homepage_banner.jpg" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+        <div class="cover" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);">
+        </div>
+    </div>
+
+    <div class="mdui-container" style="padding: 2rem 0;">
+        <div id="content" class="mdui-typo">
+            <h1 id="snn">SNN知识体系</h1>
+<h2 id="1-snn">1 SNN的编码方式</h2>
+<h3 id="11">1.1 速率编码</h3>
+<p>速率编码设想神经元的放电（即脉冲）频率隐含信息，因此以脉冲放电频率作为编码的基础。脉冲放电的频率越高，其所代表的值越大。</p>
+<p>$$
+\begin{matrix}
+→ & t \\\\
+| & & | & | & | & & & | & 5 \\\\
+| & & & | & & & & & 2 \\\\
+| & | & | & | & | & | & | & | & 8 \\\\
+| & & & | & | & & | & & 4
+\end{matrix}
+$$</p>
+<p>速率编码可用python模拟如下所示：</p>
+<pre><code class="language-python">import torch
+import random
+
+def rate_coding(values, precision = 20):
+    while True:
+        yield torch.tensor([(v &gt;= random.randint(0, precision)) + 0.0 for v in values])
+
+values = [5, 2, 8, 4]
+prec = 40
+rc = rate_coding(values, prec)
+
+sum = torch.zeros(len(values))
+
+for i in range(prec):
+    spikes = next(rc)
+    print(spikes)
+    sum += spikes
+
+print(sum)
+</code></pre>
+<p>速率编码的优势在于：</p>
+<ol>
+<li>
+<p>鲁棒性更强：速率编码不受脉冲时序的影响，因此对于输入信号的微小变化更加鲁棒。在时间编码中，输入信号的微小变化可能会导致脉冲时序的变化，从而影响神经元的激活。</p>
+</li>
+<li>
+<p>更高的信息传输速率：由于速率编码使用脉冲的频率来表示输入信号的大小，因此可以使用更高的频率来传输更多的信息。相比之下，时间编码的信息传输速率较低，因为每个脉冲都需要一定的时间来传输。</p>
+</li>
+<li>
+<p>更容易实现：速率编码只需要统计一段时间内脉冲的数量，因此更容易实现。相比之下，时间编码需要准确地测量脉冲的时间，这可能需要更高的精度和计算能力。</p>
+</li>
+</ol>
+<p>然而，其也存在劣势：</p>
+<ol>
+<li>
+<p>时间/空间开销较大：在速率编码中，每个神经元需要记录一定时间内脉冲的数量，因此需要较大的存储空间和计算成本，信息也只能在时间窗口的末尾才能表现出来。相比之下，时间编码中只需要记录每个脉冲的相对时间，且由于首个脉冲携带信息的可能性更大，因此空间开销较小。</p>
+</li>
+<li>
+<p>精度有限：速率编码的精度受到采样时间的限制，采样时间越短，精度越高，但同时也会增加计算复杂度和存储需求。相比之下，时间编码可以获得更高的精度，因为它可以记录每个脉冲的确切时间。</p>
+</li>
+<li>
+<p>不易处理异步事件：在速率编码中，每个神经元的脉冲频率是连续的，因此难以处理异步事件。相比之下，时间编码可以处理不同神经元之间的异步事件，因为每个脉冲的相对时间是离散的。</p>
+</li>
+</ol>
+<h3 id="12">1.2 时间编码</h3>
+<p>时间编码设想脉冲间精确的放电时间隐含信息，因此以脉冲之间放电的精确时间作为编码的基础。一般是以最早到达神经元的脉冲作为基准，相对放电时间越晚，所代表的值越大。</p>
+<p>$$
+\begin{matrix}
+→ & t \\\\
+ & & | & | & | & & & | & 2 \\\\
+| & & & | & & & & & 0 \\\\
+ & | & | & | & | & | & | & | & 1 \\\\
+ & & & & & | & | & & 5
+\end{matrix}
+$$</p>
+<p>时间编码可用python模拟如下所示：</p>
+<pre><code class="language-python">import torch
+import random
+
+def temporal_coding(values):
+    t = 0
+    while True:
+        yield torch.tensor([min(1, (v == t) + min((v &lt;= t), random.randint(0, 1))) + 0.0 for v in values])
+        t += 1
+
+values = [2, 0, 1, 5]
+time_steps = 40
+rc = temporal_coding(values)
+
+for i in range(time_steps):
+    spikes = next(rc)
+    print(spikes)
+</code></pre>
+<p>时间编码的优势在于：</p>
+<ol>
+<li>
+<p>更高的精度：时间编码可以记录每个脉冲的精确时间，因此相比于速率编码，时间编码可以获得更高的精度。</p>
+</li>
+<li>
+<p>更高的信息容量：时间编码可以通过微小的时间差来编码不同的输入信号，因此可以获得更高的信息容量。这对于需要处理大量输入信号的任务非常有用。</p>
+</li>
+<li>
+<p>更适用于异步事件：采用时间编码时，不同神经元之间的事件不需要同步。这对于需要处理异步事件的任务非常有用。</p>
+</li>
+</ol>
+<p>然而，时间编码的劣势也很明显：</p>
+<ol>
+<li>鲁棒性不足：时间编码中时间所代表的值取决于每个脉冲与最早产生的脉冲之间的相对时间差，当最早产生的脉冲易主时，整个脉冲所包含的时间会随之变化。</li>
+</ol>
+<h2 id="2-snn">2 SNN神经元的类型</h2>
+<h3 id="21-hh">2.1 霍奇金-赫胥黎神经元模型（HH模型）</h3>
+<h3 id="22-iflif">2.2 IF模型与LIF模型</h3>
+<h3 id="23-srm">2.3 SRM模型</h3>
+<h2 id="3-snn">3 SNN的学习方式</h2>
+<h3 id="31">3.1 无监督学习</h3>
+<h4 id="311-stdp">3.1.1 STDP</h4>
+<h3 id="32">3.2 间接监督学习</h3>
+<h4 id="321-annsnn">3.2.1 ANN转SNN</h4>
+<h3 id="33">3.3 直接监督学习</h3>
+<h4 id="331-stbp">3.3.1 STBP</h4>
+<h4 id="332-bptt">3.3.2 BPTT</h4>
+<h2 id="4-snn">4 SNN的硬件部署</h2>
+<h3 id="41-snniir">4.1 SNN以IIR的形式部署</h3>
+<h3 id="42">4.2 时空代数与时空计算网络</h3>
+<h2 id="_1">参考文献</h2>
+        </div>
+    </div>
+
+    <div id="footer" style="padding: 2rem 0;">
+        <div class="mdui-text-center mdui-text-color-grey">
+            @AmperiaWang
+            <span id="footer-year"></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"
+        integrity="sha384-gCMZcshYKOGRX9r6wbDrvF+TcCCswSHFucUzUPwka+Gr+uHgjlYvkABr95TCOz3A"
+        crossorigin="anonymous"></script>
+
+    <script>
+        function comingSoon() {
+            mdui.snackbar("敬请期待");
+        }
+
+        function formatContent(node) {
+            let len = node.childNodes.length;
+            if (!len) {
+                return;
+            }
+            for (let idx = 0; idx < len; idx++) {
+                let el = node.childNodes[idx];
+                let elTag = el.nodeName.toLowerCase();
+                if (elTag == "img") {
+                    if(node.className == "mdui-text-center") {
+                        break;
+                    }
+                    node.setAttribute("class", "mdui-text-center");
+                    let imageDescription = document.createElement("div");
+                    imageDescription.setAttribute("class", "description mdui-text-color-grey mdui-typo-caption");
+                    imageDescription.innerHTML = "图<span class='image-index'></span>&nbsp;&nbsp;" + el.alt;
+                    el.outerHTML = el.outerHTML + imageDescription.outerHTML;
+                    len++;
+                    idx++;
+                }
+                if (elTag == "table") {
+                    el.setAttribute("class", "mdui-table");
+                }
+                formatContent(el);
+            }
+        }
+
+        var inst = new mdui.Tab("#appbar-tab");
+        MathJax = {
+            tex: {
+                inlineMath: [["$", "$"]]
+            }
+        };
+
+        document.onreadystatechange = function (e) {
+            let footerYear = document.getElementById("footer-year");
+            footerYear.innerHTML = (new Date()).getFullYear();
+
+            let content = document.getElementById("content");
+
+            formatContent(content);
+
+            let indices = document.getElementsByClassName("image-index");
+            for (let idx = 0; idx < indices.length; idx++) {
+                indices[idx].innerHTML = (idx + 1);
+            }
+
+            mdui.mutation();
+        }
+    </script>
+    <script id="MathJax-script" async src="https://cdn.bootcss.com/mathjax/3.0.5/es5/tex-mml-chtml.js"></script>
+</body>
+
+</html>
