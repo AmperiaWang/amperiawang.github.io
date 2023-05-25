@@ -7,6 +7,11 @@ import markdown
 import string
 import shutil
 
+class Menu:
+    path = ""
+    title = ""
+    list = []
+
 def formulaEscape(formula):
     table = {
         "α": "\\alpha", "β": "\\beta", "Γ": "\\Gamma", "γ": "\\gamma",
@@ -46,28 +51,63 @@ def createNote(data, template):
 
 def convert(source, dest, path, template):
     subPathList = os.listdir(source + path)
+    menuList = []
+    menu = {"list": []}
+    menu["path"] = path
     for fileName in subPathList:
-        menu = []
         if os.path.isfile(source + path + fileName):
-            if fileName.endswith(".md"):
+            if fileName.startswith("__") or fileName.startswith("$") or fileName.startswith("~"):
+                continue
+            elif fileName.endswith(".md"):
                 with open(source + path + fileName, "r", encoding="utf-8") as f:
                     s, title = createNote(f.read(), template)
-                    menu.append([fileName.replace(".md", ""), title])
+                    menu["list"].append([fileName.replace(".md", ""), title])
                 with open(dest + path + fileName.replace(".md", ".html"), "w", encoding="utf-8") as f:
                     f.write(s)
             else:
-                shutil.copyfile(source + path + fileName,
-                                dest + path + fileName)
+                if fileName == "title.txt":
+                    with open(source + path + fileName, "r", encoding="utf-8") as f:
+                        menu["title"] = f.read()
+                else:
+                    shutil.copyfile(source + path + fileName, dest + path + fileName)
         elif os.path.isdir(source + path + fileName):
             os.mkdir(dest + path + fileName)
-            convert(source, dest, path + fileName + "/", template)
+            menuList = menuList + convert(source, dest, path + fileName + "/", template)
+    if len(menu["list"]):
+        menuList.append(menu)
+    return menuList
 
+def genMenu(menuList):
+    big_template = """
+    <div class="mdui-panel-item">
+        <div class="mdui-panel-item-header">
+            <i class="mdui-icon material-icons">book</i>
+            {{$1}}
+        </div>
+        <div class="mdui-panel-item-body">
+            <div class="mdui-list" data-path="{{$2}}">
+            {{$3}}
+            </div>
+        </div>
+    </div>
+    """
+    small_template = """
+    <a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="{{$1}}" onclick="openNote(this);">{{$2}}</a>
+    """
+    res = ""
+    for i in menuList:
+        s = ""
+        for j in i["list"]:
+            s += small_template.replace("{{$1}}", j[0]).replace("{{$2}}", j[1])
+        res += big_template.replace("{{$1}}", i["title"]).replace("{{$2}}", i["path"]).replace("{{$3}}", s)
+    return res
 
 if __name__ == "__main__":
     argList = sys.argv
     source_path = "./note_source/"
     dest_path = "./note/"
     template_file = "./reader.html"
+    homepage_template_file = "./index_template.html"
     if len(argList) >= 2:
         source_path = argList[1]
     if len(argList) >= 3:
@@ -78,4 +118,9 @@ if __name__ == "__main__":
         template = f.read()
     shutil.rmtree(dest_path)
     os.mkdir(dest_path)
-    convert(source_path, dest_path, "", template)
+    menuList = convert(source_path, dest_path, "", template)
+    with open(homepage_template_file, "r", encoding="utf-8") as f:
+        homepage_template = f.read()
+    homepage = homepage_template.replace("{{menu}}", genMenu(menuList))
+    with open("./index.html", "w", encoding="utf-8") as f:
+        f.write(homepage)

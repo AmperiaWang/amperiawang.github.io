@@ -29,7 +29,7 @@
     </div>
 
     <div class="banner" style="position: relative; width: 100%; height: 30vh;">
-        <img src="/assets/homepage_banner.jpg" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+        <img src="./assets/1-1.png" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
         <div class="cover" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);">
         </div>
     </div>
@@ -53,7 +53,7 @@ $$</p>
 <pre><code class="language-python">import torch
 import random
 
-def rate_coding(values, precision = 20):
+def rate_coding(values, precision: int = 20):
     while True:
         yield torch.tensor([(v &gt;= random.randint(0, precision)) + 0.0 for v in values])
 
@@ -141,8 +141,154 @@ for i in range(time_steps):
 </ol>
 <h2 id="2-snn">2 SNN神经元的类型</h2>
 <h3 id="21-hh">2.1 霍奇金-赫胥黎神经元模型（HH模型）</h3>
-<h3 id="22-iflif">2.2 IF模型与LIF模型</h3>
-<h3 id="23-srm">2.3 SRM模型</h3>
+<h3 id="22-lif">2.2 LIF模型</h3>
+<p>由HH模型我们得知，注入细胞的电流满足如下公式：</p>
+<p>$$I=C\frac{dV}{dt}+g_{Na}(V-E_{Na})+g_{K}(V-E_{K})+g_{L}(V-E_{L})$$</p>
+<p>将电流整合在一起，可以得到：</p>
+<p>$$I=g(V-E)+C\frac{dV}{dt}$$</p>
+<p>其中</p>
+<p>$$g=g_{Na}+g_{K}+g_{L},E=\frac{E_{Na}+E_{K}+E_{L}}{g_{Na}+g_{K}+g_{L}}$$</p>
+<p>设初值$t=t_{0},V=V_{0}$，解微分方程可得</p>
+<p>$$V=(V_{0}-E-\frac{I}{g})e^{-\frac{t-t_{0}}{\tau }}+E+\frac{I}{g}$$</p>
+<p>其中$\tau =\frac{C}{g}$为时间常数，约等于$10ms$。</p>
+<p>上式表明，在持续稳定的电流作用下，神经元的电位会逐渐达到顶峰；当受到短暂的电流刺激后，神经元的电位有时来不及达到顶峰便直接开始衰减。此时膜电位的值就和输入脉冲的个数、频率等有关。加入微小时间分量$\Delta t$，当自然衰减时，可以得到</p>
+<p>$$V(t)=\frac{I}{g}[1-(1-\frac{\Delta t}{\tau })]e^{-\frac{t-t_{0}-\Delta t}{\tau }}+E=\frac{I}{g}\frac{\Delta t}{\tau }e^{-\frac{t-t_{0}}{\tau }}+E$$</p>
+<p>又由$q=I\Delta t$，$C=g\tau $得</p>
+<p>$$V(t)=\frac{q}{C}e^{-\frac{t-t_{0}}{\tau }}+E$$</p>
+<p>这便是LIF模型的生物学原理：在受到刺激时，神经元胞体内会产生反应，造成胞体电位的上升；胞体电位会随时间而衰减，会随新脉冲的到来而增加；当电位越过阈值时，神经元电位重置，并产生一段时间的不应期（期间不产生任何脉冲）。</p>
+<p>整个LIF模型使用数学公式描述如下：</p>
+<p>（1）神经元胞体电位，由突触传来的脉冲、偏置电位与历史电位相加而成；</p>
+<p>$$U_{i}^{l}(t)=\sum_{j}{W_{ij}O_{j}^{l-1}(t)}+b_{i}+H_{i}^{l}(t)$$</p>
+<p>（2）神经元是否产生脉冲，由电位与阈值经过Heaviside阶跃函数$u(·)$得出；</p>
+<p>$$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$</p>
+<p>（3）神经元历史电位，由当前电位与是否产生脉冲得出。</p>
+<p>$$H_{i}^{l}(t)=\tau U_{i}^{l}(t)[1-O_{i}^{l}(t)]$$</p>
+<p><img alt="LIF神经元计算示意图" src="./assets/1-1.png" /></p>
+<p>整个模型可用python模拟如下：</p>
+<pre><code class="language-python">import torch
+
+class Heaviside(torch.autograd.Function): 
+    @staticmethod
+    def forward(ctx, i):
+        &quot;&quot;&quot;
+        阶跃函数前向传播公式
+        &quot;&quot;&quot;
+        ctx.save_for_backward(i)
+        return i.gt(0).float()
+
+    @staticmethod
+    def backward(ctx, g_o):
+        &quot;&quot;&quot;
+        阶跃函数反向传播公式
+        &quot;&quot;&quot;
+        i = ctx.saved_tensors
+        g_i = g_o.clone() 
+        temp = abs(i) &lt; 0.5
+        return g_i * temp.float(), None
+
+class LIF(torch.nn.Module):
+    def __init__(self, input_shape: int, output_shape: int, max_weight: float, bias: float, threshold: float, tau: float, weights: torch.tensor = None):
+        super().__init__()
+        self.input_shape = input_shape
+        self.output_shape = output_shape
+        self.max_weight = max_weight
+        self.bias = bias
+        self.threshold = threshold
+        self.tau = tau
+        if weights is None:
+            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+        else:
+            self.weights = weights
+        self.history = torch.zeros(self.output_shape)
+
+    def forward(self, x):
+        x = x.view(self.input_shape, 1)
+        x = self.weights @ x
+        x = x.view(self.output_shape)
+        x = x + self.bias + self.history
+        o = Heaviside.apply(x - self.threshold)
+        self.history = (x * self.tau) * (1 - o)
+        return o
+
+if __name__ == &quot;__main__&quot;:
+    values = [5, 2, 8, 4, 0, 3]
+    prec = 40
+    rc = rate_coding(values, prec)
+    lif = LIF(6, 4, 8, 0, 12, 0.5)
+
+    for i in range(prec):
+        input_spikes = next(rc)
+        output_spikes = lif(input_spikes)
+        print(output_spikes)
+</code></pre>
+<h3 id="23-srm0">2.3 SRM0模型</h3>
+<p>LIF模型的电位在神经元的胞体中累积并计算脉冲，而SRM0模型的电位在各个突触中累积并计算脉冲。在SRM0模型中，来自前一个神经元的脉冲在突触处累积电位，在胞体中加和并计算脉冲。</p>
+<p>整个SRM0模型使用公式描述如下：</p>
+<p>（1）各个突触内的电压，由上一层的脉冲与该突触的历史相加而成；</p>
+<p>$$U_{ij}^{l}(t)=w_{ij}O_{j}^{l-1}(t)+H_{ij}^{l}(t-1)$$</p>
+<p>（2）胞体的电位由各个突触的电位累积而成；</p>
+<p>$$U_{i}^{l}(t)=\sum_{j}{U_{ij}^{l}(t)}·[1-O_{i}^{l}(t)]$$</p>
+<p>（3）神经元是否产生脉冲，由电位与阈值经过Heaviside阶跃函数$u(·)$得出；</p>
+<p>$$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$</p>
+<p>（4）各个突触内的历史由突触电位与胞体是否发射脉冲共同作用而成。</p>
+<p>$$H_{ij}^{l}(t-1)=\tau U_{ij}^{l}(t)[1-O_{i}^{l}(t)]$$</p>
+<p><img alt="SRM0神经元计算示意图" src="./assets/1-2.png" /></p>
+<p>整个模型可用python模拟如下：</p>
+<pre><code class="language-python">import torch
+
+class Heaviside(torch.autograd.Function): 
+    @staticmethod
+    def forward(ctx, i):
+        &quot;&quot;&quot;
+        阶跃函数前向传播公式
+        &quot;&quot;&quot;
+        ctx.save_for_backward(i)
+        return i.gt(0).float()
+
+    @staticmethod
+    def backward(ctx, g_o):
+        &quot;&quot;&quot;
+        阶跃函数反向传播公式
+        &quot;&quot;&quot;
+        i = ctx.saved_tensors
+        g_i = g_o.clone() 
+        temp = abs(i) &lt; 0.5
+        return g_i * temp.float(), None
+
+class SRM0(torch.nn.Module):
+    def __init__(self, input_shape: int, output_shape: int, max_weight: float, threshold: float, tau: float, weights: torch.tensor = None):
+        super().__init__()
+        self.input_shape = input_shape
+        self.output_shape = output_shape
+        self.max_weight = max_weight
+        self.threshold = threshold
+        self.sigma = torch.ones(self.input_shape, 1)
+        self.tau = tau
+        if weights is None:
+            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+        else:
+            self.weights = weights
+        self.history = torch.zeros(self.output_shape, self.input_shape)
+
+    def forward(self, x):
+        x = self.weights * x + self.history * self.tau
+        u = x @ self.sigma
+        u = u.view(self.output_shape)
+        o = Heaviside.apply(u - self.threshold)
+        self.history = (x * self.tau) * (1 - torch.repeat_interleave(o.view(self.output_shape, 1), self.input_shape, dim = 1))
+        return o
+
+if __name__ == &quot;__main__&quot;:
+    values = [5, 2, 8, 4, 0, 3]
+    prec = 40
+    rc = rate_coding(values, prec)
+    srm0 = SRM0(6, 4, 8, 10, 0.5)
+
+    for i in range(prec):
+        input_spikes = next(rc)
+        output_spikes = srm0(input_spikes)
+        print(output_spikes)
+</code></pre>
 <h2 id="3-snn">3 SNN的学习方式</h2>
 <h3 id="31">3.1 无监督学习</h3>
 <h4 id="311-stdp">3.1.1 STDP</h4>
