@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
         integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -50,7 +51,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"
         integrity="sha384-gCMZcshYKOGRX9r6wbDrvF+TcCCswSHFucUzUPwka+Gr+uHgjlYvkABr95TCOz3A"
         crossorigin="anonymous"></script>
-
+    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <script>
         function comingSoon() {
             mdui.snackbar("敬请期待");
@@ -65,7 +66,7 @@
                 let el = node.childNodes[idx];
                 let elTag = el.nodeName.toLowerCase();
                 if (elTag == "img") {
-                    if(node.className == "mdui-text-center") {
+                    if (node.className == "mdui-text-center") {
                         break;
                     }
                     node.setAttribute("class", "mdui-text-center");
@@ -104,6 +105,8 @@
             }
 
             mdui.mutation();
+
+            hljs.highlightAll();
         }
     </script>
     <script id="MathJax-script" async src="https://cdn.bootcss.com/mathjax/3.0.5/es5/tex-mml-chtml.js"></script>

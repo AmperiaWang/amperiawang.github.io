@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
         integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -143,6 +144,16 @@ for i in range(time_steps):
 <h2 id="2-snn">2 SNN神经元的类型</h2>
 <p>与ANN相似的是，SNN的组成也是由神经元组成层，再由层组成整个SNN计算网络。SNN中神经元的选择也尤为关键。神经元的目的是处理输入的脉冲，并且由输入的脉冲产生对应输出的脉冲。根据内部运算方式的不同，神经元模型可以被分为如下几种。其中由于SNN中神经元的生物学原理相似，每种神经元之间都能找到相对应的共有的结构或模式，但每种神经元彼此之间又不尽相同：</p>
 <h3 id="21-hh">2.1 霍奇金-赫胥黎神经元模型（HH模型）</h3>
+<p>HH模型将细胞膜看作一个具有膜电容$C_{M}$和泄露电导$G_{M}$的模型，由于细胞膜内外离子浓度的不同，细胞膜会维持在一个静息电位$V_{rest}$。离子$K^{+}$和$Na^{+}$的流动也会对膜电位产生一定影响。可将其总结为如下公式：$^{[4]}$</p>
+<p>$$I_{m}=C_{m}\frac{dV_{m}}{dt}+I_{Na}+I_{K}+I_{l}$$</p>
+<p>其中泄露电流的计算公式可以总结如下</p>
+<p>$$I_{l}=g_{l}(V-E_{L})$$</p>
+<p>钠离子电流的计算公式可以总结如下</p>
+<p>$$I_{Na}=g_{Na}(V-E_{Na})$$</p>
+<p>钾离子电流的计算公式可以总结如下</p>
+<p>$$I_{K}=g_{K}(V-E_{K})$$</p>
+<p>整个模型如下图所示：</p>
+<p><img alt="霍奇金-赫胥黎模型示意图" src="./assets/1-1.png" /></p>
 <h3 id="22-lif">2.2 LIF模型</h3>
 <p>由HH模型我们得知，注入细胞的电流满足如下公式：</p>
 <p>$$I=C\frac{dV}{dt}+g_{Na}(V-E_{Na})+g_{K}(V-E_{K})+g_{L}(V-E_{L})$$</p>
@@ -168,24 +179,18 @@ for i in range(time_steps):
 <p>（3）神经元历史电位，由当前电位与是否产生脉冲得出，</p>
 <p>$$H_{i}^{l}(t)=\tau U_{i}^{l}(t-1)[1-O_{i}^{l}(t-1)]$$</p>
 <p>其中$\tau $为时间常数。</p>
-<p><img alt="LIF神经元计算示意图" src="./assets/1-1.png" /></p>
+<p><img alt="LIF神经元计算示意图" src="./assets/1-2.png" /></p>
 <p>整个模型可用python模拟如下：</p>
 <pre><code class="language-python">import torch
 
 class Heaviside(torch.autograd.Function): 
     @staticmethod
     def forward(ctx, i):
-        &quot;&quot;&quot;
-        阶跃函数前向传播公式
-        &quot;&quot;&quot;
         ctx.save_for_backward(i)
         return i.gt(0).float()
 
     @staticmethod
     def backward(ctx, g_o):
-        &quot;&quot;&quot;
-        阶跃函数反向传播公式
-        &quot;&quot;&quot;
         i = ctx.saved_tensors
         g_i = g_o.clone() 
         temp = abs(i) &lt; 0.5
@@ -240,24 +245,18 @@ if __name__ == &quot;__main__&quot;:
 <p>（4）各个突触内的历史由突触电位与胞体是否发射脉冲共同作用而成，</p>
 <p>$$H_{ij}^{l}(t)=\tau U_{ij}^{l}(t-1)[1-O_{i}^{l}(t-1)]$$</p>
 <p>其中$\tau $为时间常数。</p>
-<p><img alt="SRM0神经元计算示意图" src="./assets/1-2.png" /></p>
+<p><img alt="SRM0神经元计算示意图" src="./assets/1-3.png" /></p>
 <p>整个模型可用python模拟如下：</p>
 <pre><code class="language-python">import torch
 
 class Heaviside(torch.autograd.Function): 
     @staticmethod
     def forward(ctx, i):
-        &quot;&quot;&quot;
-        阶跃函数前向传播公式
-        &quot;&quot;&quot;
         ctx.save_for_backward(i)
         return i.gt(0).float()
 
     @staticmethod
     def backward(ctx, g_o):
-        &quot;&quot;&quot;
-        阶跃函数反向传播公式
-        &quot;&quot;&quot;
         i = ctx.saved_tensors
         g_i = g_o.clone() 
         temp = abs(i) &lt; 0.5
@@ -312,7 +311,7 @@ if __name__ == &quot;__main__&quot;:
 <p>（4）神经元的输出取决于神经元当前的电位，</p>
 <p>$$X_{i}^{l}(t)=f[U_{i}^{l}(t),u_{th}]$$</p>
 <p>其中$f(·)$为动作函数（但不能是阶跃函数$u(·)$，否则会降级为LIF）。</p>
-<p><img alt="LIAF神经元计算示意图" src="./assets/1-3.png" /></p>
+<p><img alt="LIAF神经元计算示意图" src="./assets/1-4.png" /></p>
 <p>整个模型可用python模拟如下：</p>
 <pre><code class="language-python">import torch
 
@@ -404,7 +403,7 @@ if __name__ == &quot;__main__&quot;:
     <script src="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"
         integrity="sha384-gCMZcshYKOGRX9r6wbDrvF+TcCCswSHFucUzUPwka+Gr+uHgjlYvkABr95TCOz3A"
         crossorigin="anonymous"></script>
-
+    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <script>
         function comingSoon() {
             mdui.snackbar("敬请期待");
@@ -419,7 +418,7 @@ if __name__ == &quot;__main__&quot;:
                 let el = node.childNodes[idx];
                 let elTag = el.nodeName.toLowerCase();
                 if (elTag == "img") {
-                    if(node.className == "mdui-text-center") {
+                    if (node.className == "mdui-text-center") {
                         break;
                     }
                     node.setAttribute("class", "mdui-text-center");
@@ -458,6 +457,8 @@ if __name__ == &quot;__main__&quot;:
             }
 
             mdui.mutation();
+
+            hljs.highlightAll();
         }
     </script>
     <script id="MathJax-script" async src="https://cdn.bootcss.com/mathjax/3.0.5/es5/tex-mml-chtml.js"></script>
