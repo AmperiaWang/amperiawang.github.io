@@ -107,7 +107,36 @@ for i in range(time_steps):
 
 ### 2.1 霍奇金-赫胥黎神经元模型（HH模型）
 
+HH模型将细胞膜看作一个具有膜电容$C_{M}$和泄露电导$G_{M}$的模型，由于细胞膜内外离子浓度的不同，细胞膜会维持在一个静息电位$V_{rest}$。离子$K^{+}$和$Na^{+}$的流动也会对膜电位产生一定影响。可将其总结为如下公式：
 
+$$I_{m}=C_{m}\frac{dV_{m}}{dt}+I_{Na}+I_{K}+I_{l}$$
+
+其中泄露电流的计算公式可以总结如下
+
+$$I_{l}=g_{l}(V-E_{L})$$
+
+钠离子电流的计算公式可以总结如下
+
+$$I_{Na}=g_{Na}(V-E_{Na})$$
+
+钾离子电流的计算公式可以总结如下
+
+$$I_{K}=g_{K}(V-E_{K})$$
+
+整个模型如下图所示：
+
+![霍奇金-赫胥黎模型示意图](todo.jpg)
+
+霍奇金-赫胥黎模型可以使用python模拟如下所示：
+
+```python
+import torch
+
+class HH(nn.Module):
+    def __init__(self):
+        super(HH, self).__init__()
+        self.
+```
 
 ### 2.2 LIF模型
 
@@ -163,17 +192,11 @@ import torch
 class Heaviside(torch.autograd.Function): 
     @staticmethod
     def forward(ctx, i):
-        """
-        阶跃函数前向传播公式
-        """
         ctx.save_for_backward(i)
         return i.gt(0).float()
 
     @staticmethod
     def backward(ctx, g_o):
-        """
-        阶跃函数反向传播公式
-        """
         i = ctx.saved_tensors
         g_i = g_o.clone() 
         temp = abs(i) < 0.5
@@ -247,17 +270,11 @@ import torch
 class Heaviside(torch.autograd.Function): 
     @staticmethod
     def forward(ctx, i):
-        """
-        阶跃函数前向传播公式
-        """
         ctx.save_for_backward(i)
         return i.gt(0).float()
 
     @staticmethod
     def backward(ctx, g_o):
-        """
-        阶跃函数反向传播公式
-        """
         i = ctx.saved_tensors
         g_i = g_o.clone() 
         temp = abs(i) < 0.5
