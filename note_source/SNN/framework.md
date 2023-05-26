@@ -2,9 +2,11 @@
 
 ## 1 SNN的编码方式
 
+不同于ANN的是，SNN中的值以脉冲的形式传递。将数值转为脉冲的过程被称作编码（encoding）。在SNN中，根据信息编码为脉冲时所利用到的属性的不同，可以将编码方式分为以下几种：
+
 ### 1.1 速率编码
 
-速率编码设想神经元的放电（即脉冲）频率隐含信息，因此以脉冲放电频率作为编码的基础。脉冲放电的频率越高，其所代表的值越大。
+速率编码设想神经元的放电（即脉冲）频率隐含信息，因此以脉冲放电频率作为编码的基础。脉冲放电的频率越高，其所代表的值越大。$^{[1][2]}$
 
 $$
 \begin{matrix}
@@ -58,7 +60,7 @@ print(sum)
 
 ### 1.2 时间编码
 
-时间编码设想脉冲间精确的放电时间隐含信息，因此以脉冲之间放电的精确时间作为编码的基础。一般是以最早到达神经元的脉冲作为基准，相对放电时间越晚，所代表的值越大。
+时间编码设想脉冲间精确的放电时间隐含信息，因此以脉冲之间放电的精确时间作为编码的基础。一般是以最早到达神经元的脉冲作为基准，相对放电时间越晚，所代表的值越大。$^{[1][3]}$
 
 $$
 \begin{matrix}
@@ -105,6 +107,8 @@ for i in range(time_steps):
 
 ## 2 SNN神经元的类型
 
+与ANN相似的是，SNN的组成也是由神经元组成层，再由层组成整个SNN计算网络。SNN中神经元的选择也尤为关键。神经元的目的是处理输入的脉冲，并且由输入的脉冲产生对应输出的脉冲。根据内部运算方式的不同，神经元模型可以被分为如下几种。其中由于SNN中神经元的生物学原理相似，每种神经元之间都能找到相对应的共有的结构或模式，但每种神经元彼此之间又不尽相同：
+
 ### 2.1 霍奇金-赫胥黎神经元模型（HH模型）
 
 
@@ -139,19 +143,25 @@ $$V(t)=\frac{q}{C}e^{-\frac{t-t_{0}}{τ}}+E$$
 
 这便是LIF模型的生物学原理：在受到刺激时，神经元胞体内会产生反应，造成胞体电位的上升；胞体电位会随时间而衰减，会随新脉冲的到来而增加；当电位越过阈值时，神经元电位重置，并产生一段时间的不应期（期间不产生任何脉冲）。
 
-整个LIF模型使用数学公式描述如下：
+整个LIF模型使用数学公式描述如下：$^{[5]}$
 
-（1）神经元胞体电位，由突触传来的脉冲、偏置电位与历史电位相加而成；
+（1）神经元胞体电位，由突触传来的脉冲、偏置电位与历史电位相加而成，
 
-$$U_{i}^{l}(t)=\sum_{j}{W_{ij}O_{j}^{l-1}(t)}+b_{i}+H_{i}^{l}(t)$$
+$$U_{i}^{l}(t)=\sum_{j}{w_{ij}O_{j}^{l-1}(t)}+b_{i}+H_{i}^{l}(t)$$
 
-（2）神经元是否产生脉冲，由电位与阈值经过Heaviside阶跃函数$u(·)$得出；
+其中$w_{ij}$为权重，$b_{i}$为偏置；
+
+（2）神经元是否产生脉冲，由电位与阈值经过Heaviside阶跃函数$u(·)$得出，
 
 $$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$
 
-（3）神经元历史电位，由当前电位与是否产生脉冲得出。
+其中$u_{th}$为阈电位；
 
-$$H_{i}^{l}(t)=τU_{i}^{l}(t)[1-O_{i}^{l}(t)]$$
+（3）神经元历史电位，由当前电位与是否产生脉冲得出，
+
+$$H_{i}^{l}(t)=τU_{i}^{l}(t-1)[1-O_{i}^{l}(t-1)]$$
+
+其中$τ$为时间常数。
 
 ![LIF神经元计算示意图](./assets/1-1.png)
 
@@ -219,23 +229,29 @@ if __name__ == "__main__":
 
 LIF模型的电位在神经元的胞体中累积并计算脉冲，而SRM0模型的电位在各个突触中累积并计算脉冲。在SRM0模型中，来自前一个神经元的脉冲在突触处累积电位，在胞体中加和并计算脉冲。
 
-整个SRM0模型使用公式描述如下：
+整个SRM0模型使用公式描述如下：$^{[6]}$
 
-（1）各个突触内的电压，由上一层的脉冲与该突触的历史相加而成；
+（1）各个突触内的电位，由上一层的脉冲与该突触的历史相加而成；
 
-$$U_{ij}^{l}(t)=w_{ij}O_{j}^{l-1}(t)+H_{ij}^{l}(t-1)$$
+$$U_{ij}^{l}(t)=w_{ij}O_{j}^{l-1}(t)+H_{ij}^{l}(t)$$
+
+其中$w_{ij}$为权重；
 
 （2）胞体的电位由各个突触的电位累积而成；
 
 $$U_{i}^{l}(t)=\sum_{j}{U_{ij}^{l}(t)}·[1-O_{i}^{l}(t)]$$
 
-（3）神经元是否产生脉冲，由电位与阈值经过Heaviside阶跃函数$u(·)$得出；
+（3）神经元是否产生脉冲，由电位与阈值经过Heaviside阶跃函数$u(·)$得出，
 
 $$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$
 
-（4）各个突触内的历史由突触电位与胞体是否发射脉冲共同作用而成。
+其中$u_{th}$为阈电位；
 
-$$H_{ij}^{l}(t-1)=τU_{ij}^{l}(t)[1-O_{i}^{l}(t)]$$
+（4）各个突触内的历史由突触电位与胞体是否发射脉冲共同作用而成，
+
+$$H_{ij}^{l}(t)=τU_{ij}^{l}(t-1)[1-O_{i}^{l}(t-1)]$$
+
+其中$τ$为时间常数。
 
 ![SRM0神经元计算示意图](./assets/1-2.png)
 
@@ -298,7 +314,103 @@ if __name__ == "__main__":
         print(output_spikes)
 ```
 
+### 2.4 LIAF模型
+
+LIF模型的输入与输出均为脉冲，其在神经元中经历了电压积累与脉冲计算的过程；而LIAF模型的输入与输出均为模拟电位值，其神经元内部和LIF神经元类似，但输出的值为模拟电位$U_{i}^{l}(t)$。
+
+整个LIAF模型使用公式描述如下：$^{[7]}$
+
+（1）神经元胞体电位，由突触传来的电位与历史电位相加而成；
+
+$$U_{i}^{l}(t)=\sum_{j}{w_{ij}X_{j}^{l-1}(t)}+H_{i}^{l}(t)$$
+
+其中$w_{ij}$为权重；
+
+（2）神经元是否产生脉冲，由电位与阈值经过Heaviside阶跃函数$u(·)$得出，但不以脉冲作为输出，脉冲仅用于计算历史电位，
+
+$$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$
+
+其中$u_{th}$为阈电位；
+
+（3）神经元历史电位，由当前电位与是否产生脉冲得出，
+
+$$H_{i}^{l}(t)=α[u_{reset}O_{i}^{l}(t-1)+U_{i}^{l}(t-1)[1-O_{i}^{l}(t-1)]]+β$$
+
+其中$α$，$β$为参数，$u_{reset}$为重置电位；
+
+（4）神经元的输出取决于神经元当前的电位，
+
+$$X_{i}^{l}(t)=f[U_{i}^{l}(t),u_{th}]$$
+
+其中$f(·)$为动作函数（但不能是阶跃函数$u(·)$，否则会降级为LIF）。
+
+![LIAF神经元计算示意图](./assets/1-3.png)
+
+整个模型可用python模拟如下：
+
+```python
+import torch
+
+class Heaviside(torch.autograd.Function): 
+    @staticmethod
+    def forward(ctx, i):
+        """
+        阶跃函数前向传播公式
+        """
+        ctx.save_for_backward(i)
+        return i.gt(0).float()
+
+    @staticmethod
+    def backward(ctx, g_o):
+        """
+        阶跃函数反向传播公式
+        """
+        i = ctx.saved_tensors
+        g_i = g_o.clone() 
+        temp = abs(i) < 0.5
+        return g_i * temp.float(), None
+
+class LIAF(torch.nn.Module):
+    def __init__(self, input_shape: int, output_shape: int, max_weight: float, threshold: float, alpha: float, beta: float, act_fun: torch.nn.Module = torch.nn.ReLU(), weights: torch.tensor = None):
+        super().__init__()
+        self.input_shape = input_shape
+        self.output_shape = output_shape
+        self.max_weight = max_weight
+        self.threshold = threshold
+        self.alpha = alpha
+        self.beta = beta
+        self.act_fun = act_fun
+        if weights is None:
+            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+        else:
+            self.weights = weights
+        self.history = torch.zeros(self.output_shape)
+
+    def forward(self, x):
+        x = x.view(self.input_shape, 1)
+        x = self.weights @ x
+        x = x.view(self.output_shape)
+        x = x + self.history
+        o = Heaviside.apply(x - self.threshold)
+        self.history = self.alpha * (x * (1 - o)) + self.beta
+        x = self.act_fun(x - self.threshold)
+        return x
+
+if __name__ == "__main__":
+    values = [5, 2, 8, 4, 0, 3]
+    prec = 40
+    rc = rate_coding(values, prec)
+    liaf = LIAF(6, 4, 8, 12, 0.5, 0.5)
+    
+    for i in range(prec):
+        input_spikes = next(rc)
+        output_spikes = liaf(input_spikes)
+        print(output_spikes)
+```
+
 ## 3 SNN的学习方式
+
+SNN的参数要经过训练，才能完美地完成我们所给予的任务。SNN的训练方式多种多样。此处采取Wu等人（2018）的分类方式，将SNN的训练分为如下三类：
 
 ### 3.1 无监督学习
 
@@ -310,9 +422,7 @@ if __name__ == "__main__":
 
 ### 3.3 直接监督学习
 
-#### 3.3.1 STBP
-
-#### 3.3.2 BPTT
+#### 3.3.1 STBP与BPTT
 
 ## 4 SNN的硬件部署
 
@@ -321,3 +431,17 @@ if __name__ == "__main__":
 ### 4.2 时空代数与时空计算网络
 
 ## 参考文献
+
+[1] Smith J E. Space-time computing with temporal neural networks[J]. Synthesis Lectures on Computer Architecture, 2017, 12(2): i-215.
+
+[2] Fidjeland A K, Roesch E B, Shanahan M P, et al. NeMo: a platform for neural modelling of spiking neurons using GPUs[C]//2009 20th IEEE international conference on application-specific systems, architectures and processors. IEEE, 2009: 137-144.
+
+[3] Lazar A A. Time encoding with an integrate-and-fire neuron with a refractory period[J]. Neurocomputing, 2004, 58: 53-58.
+
+[4] Hodgkin A L, Huxley A F. A quantitative description of membrane current and its application to conduction and excitation in nerve[J]. The Journal of physiology, 1952, 117(4): 500.
+
+[5] Smith J E. Efficient digital neurons for large scale cortical architectures[J]. ACM SIGARCH Computer Architecture News, 2014, 42(3): 229-240.
+
+[6] Gerstner W, Kistler W M. Spiking neuron models: Single neurons, populations, plasticity[M]. Cambridge university press, 2002.
+
+[7] Wu Z, Zhang H, Lin Y, et al. Liaf-net: Leaky integrate and analog fire network for lightweight and efficient spatiotemporal information processing[J]. IEEE Transactions on Neural Networks and Learning Systems, 2021, 33(11): 6249-6262.
