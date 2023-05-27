@@ -430,9 +430,42 @@ def STDP(input_shape: int, output_shape: int, time_steps: int, input_spike_train
     return weight_matrix
 </code></pre>
 <h3 id="32">3.2 间接监督学习</h3>
+<p>间接监督学习并非直接训练脉冲神经网络，而是通过其它方式训练网络，再将训练好的网络或参数置入脉冲神经网络之中。其中最典型的方法即为ANN转SNN。</p>
 <h4 id="321-annsnn">3.2.1 ANN转SNN</h4>
 <h3 id="33">3.3 直接监督学习</h3>
-<h4 id="331-stbpbptt">3.3.1 STBP与BPTT</h4>
+<h4 id="331-">3.3.1 时间-空间反向传播</h4>
+<p>时间-空间反向传播（Spatio-Temporal Backpropagation, STBP）利用LIF神经元中关于电位、脉冲之间的内在关系，将传统的反向传播应用在基于时间-空间结构的脉冲神经网络中。</p>
+<p>回顾描述LIF神经元的数学公式：</p>
+<p>$$U_{i}^{l}(t)=\sum_{j}{w_{ij}O_{j}^{l-1}(t)}+b_{i}+H_{i}^{l}(t)$$</p>
+<p>$$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$</p>
+<p>$$H_{i}^{l}(t)=\tau U_{i}^{l}(t-1)[1-O_{i}^{l}(t-1)]$$</p>
+<p>根据链式求导法则，可以推得：</p>
+<p>$$\frac{\partial U_{i}^{l}(t)}{\partial O_{j}^{l-1}(t)}=w_{ij}$$</p>
+<p>$$\frac{\partial O_{i}^{l}(t)}{\partial U_{i}^{l}(t)}=\frac{\partial u}{\partial U_{i}^{l}(t)}$$</p>
+<p>$$\frac{\partial U_{i}^{l}(t)}{\partial U_{i}^{l}(t-1)}=\tau [1-O_{i}^{l}(t-1)]$$</p>
+<p>$$\frac{\partial O_{i}^{l}(t)}{\partial O_{i}^{l}(t-1)}=\frac{\partial O_{i}^{l}(t)}{\partial U_{i}^{l}(t)}\frac{\partial U_{i}^{l}(t)}{\partial O_{i}^{l}(t-1)}=-\tau U_{i}^{l}(t-1)\frac{\partial u}{\partial U_{i}^{l}(t)}$$</p>
+<p>设损失为均方差损失：</p>
+<p>$$L=\frac{1}{2S}\sum_{s=1}^{S}{||y_{s}-\frac{1}{T}\sum_{t=1}^{T}{O_{s}^{N}(t)}||}_{2}^{2}$$</p>
+<p>则：</p>
+<p>（1）对于最后一层$l=N$，其只需要考虑在时间维度的求导：</p>
+<p>对于最后一个时间刻$t=T$：</p>
+<p>$$\delta _{i}^{N}(T)=\frac{\partial L}{\partial O_{i}^{N}(T)}=-\frac{1}{TS}[y_{i}-\frac{1}{T}\sum_{t=1}^{T}{O_{i}^{N}(t)}]$$</p>
+<p>$$\frac{\partial L}{\partial U_{i}^{N}(T)}=\delta _{i}^{N}(T)\frac{\partial O_{i}^{N}(T)}{\partial U_{i}^{N}(T)}=\delta _{i}^{N}(T)\frac{\partial u}{\partial U_{i}^{N}(T)}$$</p>
+<p>对于前面的时间刻$t&lt; T$：</p>
+<p>$$\delta _{i}^{N}(t)=\frac{\partial L}{\partial O_{i}^{N}(t)}=\frac{\partial L}{\partial O_{i}^{N}(t+1)}\frac{\partial O_{i}^{N}(t+1)}{\partial O_{i}^{N}(t)}+\delta _{i}^{N}(T)=-\tau U_{i}^{N}(t)\delta _{i}^{N}(t+1)\frac{\partial u}{\partial U_{i}^{N}(t+1)}+\delta _{i}^{N}(T)$$</p>
+<p>$$\frac{\partial L}{\partial U_{i}^{N}(t)}=\frac{\partial L}{\partial U_{i}^{N}(t+1)}\frac{\partial U_{i}^{l}(t+1)}{\partial U_{i}^{l}(t)}=\delta _{i}^{N}(t+1)\tau [1-O_{i}^{N}(t)]\frac{\partial u}{\partial U_{i}^{N}(t+1)}$$</p>
+<p>（2）对于前面的层$l&lt; N$，其在考虑时间维度求导的基础上，还要考虑空间维度求导：</p>
+<p>对于最后一个时间刻$t=T$：</p>
+<p>$$\delta _{i}^{l}(T)=\frac{\partial L}{\partial O_{i}^{l}(T)}=\sum_{j}{\delta _{j}^{l+1}(T)\frac{\partial O_{j}^{l+1}(T)}{\partial O_{i}^{l}(T)}}=\sum_{j}{\delta _{j}^{l+1}(T)\frac{\partial u}{\partial U_{j}^{l+1}(T)}w_{ji}}$$</p>
+<p>$$\frac{\partial L}{\partial U_{i}^{l}(T)}=\delta _{i}^{l}(T)\frac{\partial O_{i}^{l}(T)}{\partial U_{i}^{l}(T)}=\delta _{i}^{l}(T)\frac{\partial u}{\partial U_{i}^{l}(T)}$$</p>
+<p>对于前面的时间刻$t&lt; T$：</p>
+<p>$$\delta _{i}^{l}(t)=\frac{\partial L}{\partial O_{i}^{l}(t)}=\sum_{j}{\delta _{j}^{l+1}(t)\frac{\partial O_{j}^{l+1}(t)}{\partial O_{i}^{l}(t)}}+\frac{\partial L}{\partial O_{i}^{l}(t+1)}\frac{\partial O_{i}^{l}(t+1)}{\partial O_{i}^{l}(t)}=\sum_{j}{\delta _{j}^{l+1}(t)\frac{\partial u}{\partial U_{j}^{l+1}(t)}w_{ji}}-\tau U_{i}^{l}(t)\delta _{i}^{l}(t+1)\frac{\partial u}{\partial U_{i}^{l}(t+1)}$$</p>
+<p>$$\frac{\partial L}{\partial U_{i}^{l}(t)}=\delta _{i}^{l}(t)\frac{\partial O_{i}^{l}(t)}{\partial U_{i}^{l}(t)}+\delta _{i}^{l}(t+1)\frac{\partial O_{i}^{l}(t+1)}{\partial U_{i}^{l}(t)}=\delta _{i}^{l}(t)\frac{\partial u}{\partial U_{i}^{l}(t)}+\delta _{i}^{l}(t+1)\tau [1-O_{i}^{l}(t)]$$</p>
+<p>随后，便可根据$\frac{\partial L}{\partial O_{i}^{l}(t)}$和$\frac{\partial L}{\partial U_{i}^{l}(t)}$计算$\frac{\partial L}{\partial b^{l}}$与$\frac{\partial L}{\partial w^{l}}$：</p>
+<p>$$\frac{\partial L}{\partial b_{i}^{l}}=\sum_{t=1}^{T}{\frac{\partial L}{\partial U_{i}^{l}(t)}\frac{\partial U_{i}^{l}(t)}{\partial b_{i}^{l}}}=\sum_{t=1}^{T}{\frac{\partial L}{\partial U_{i}^{l}(t)}}$$</p>
+<p>$$\frac{\partial L}{\partial w_{ij}^{l}}=\sum_{t=1}^{T}{\frac{\partial L}{\partial U_{i}^{l}(t)}\frac{\partial U_{i}^{l}(t)}{\partial w_{ij}^{l}}}=\sum_{t=1}^{T}{\frac{\partial L}{\partial U_{i}^{l}(t)}O_{j}^{l-1}(t)}$$</p>
+<p>由此便可更新整个脉冲神经网络的参数。由于此算法可借助pytorch中的自动求导实现，因此此处不再给出具体实现方式。可以参考代码仓库<a href="https://github.com/yjwu17/STBP-for-training-SpikingNN">https://github.com/yjwu17/STBP-for-training-SpikingNN</a>。</p>
+<h4 id="332-bptt">3.3.2 BPTT</h4>
 <h2 id="4">4 脉冲神经网络的硬件部署</h2>
 <h3 id="41-iir">4.1 脉冲神经网络以IIR的形式部署</h3>
 <h3 id="42">4.2 时空代数与时空计算网络</h3>
