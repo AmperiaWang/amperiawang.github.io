@@ -1,8 +1,8 @@
-# SNN知识体系
+# 脉冲神经网络知识体系
 
-## 1 SNN的编码方式
+## 1 脉冲神经网络的编码方式
 
-不同于ANN的是，SNN中的值以脉冲的形式传递。将数值转为脉冲的过程被称作编码（encoding）。在SNN中，根据信息编码为脉冲时所利用到的属性的不同，可以将编码方式分为以下几种：
+不同于ANN的是，脉冲神经网络（SNN）中的值以脉冲的形式传递。将数值转为脉冲的过程被称作编码（encoding）。在脉冲神经网络中，根据信息编码为脉冲时所利用到的属性的不同，可以将编码方式分为以下几种：
 
 ### 1.1 速率编码
 
@@ -105,9 +105,9 @@ for i in range(time_steps):
 
 1. 鲁棒性不足：时间编码中时间所代表的值取决于每个脉冲与最早产生的脉冲之间的相对时间差，当最早产生的脉冲易主时，整个脉冲所包含的时间会随之变化。
 
-## 2 SNN神经元的类型
+## 2 脉冲神经网络神经元的类型
 
-与ANN相似的是，SNN的组成也是由神经元组成层，再由层组成整个SNN计算网络。SNN中神经元的选择也尤为关键。神经元的目的是处理输入的脉冲，并且由输入的脉冲产生对应输出的脉冲。根据内部运算方式的不同，神经元模型可以被分为如下几种。其中由于SNN中神经元的生物学原理相似，每种神经元之间都能找到相对应的共有的结构或模式，但每种神经元彼此之间又不尽相同：
+与ANN相似的是，脉冲神经网络的组成也是由神经元组成层，再由层组成整个脉冲神经网络计算网络。脉冲神经网络中神经元的选择也尤为关键。神经元的目的是处理输入的脉冲，并且由输入的脉冲产生对应输出的脉冲。根据内部运算方式的不同，神经元模型可以被分为如下几种。其中由于脉冲神经网络中神经元的生物学原理相似，每种神经元之间都能找到相对应的共有的结构或模式，但每种神经元彼此之间又不尽相同：
 
 ### 2.1 霍奇金-赫胥黎神经元模型（HH模型）
 
@@ -414,13 +414,77 @@ if __name__ == "__main__":
         print(output_spikes)
 ```
 
-## 3 SNN的学习方式
+## 3 脉冲神经网络的学习方式
 
-SNN的参数要经过训练，才能完美地完成我们所给予的任务。SNN的训练方式多种多样。此处采取Wu等人（2018）的分类方式，将SNN的训练分为如下三类：
+脉冲神经网络的参数要经过训练，才能完美地完成我们所给予的任务。脉冲神经网络的训练方式多种多样。此处采取Wu等人（2018）的分类方式，将脉冲神经网络的训练分为如下三类：
 
 ### 3.1 无监督学习
 
-#### 3.1.1 STDP
+无监督学习旨在通过观察每个神经元自己的输入与输出来自动调整每个神经元的权重，以对不同的输入模式做不同的响应。在这之中，最典型的无监督学习方式就是STDP。
+
+#### 3.1.1 脉冲时序依赖可塑性
+
+脉冲时序依赖可塑性（Spike-timing Dependent Plasticity, STDP）可以用来训练脉冲神经网络的神经元。作为一个时许非对称形式的Hebb学习法则，其依赖突触前和突触后神经元脉冲之间的紧密时间相关性来进行训练。$^{[8],[9]}$
+
+假设编号为$i$的神经元第$j$个突触的输入脉冲序列为$\vec{t}_{j}=\{t|O_{j}^{l-1}(t)=1\}$，输出脉冲序列为$\vec{t}_{i}=\{t|O_{i}^{l}(t)=1\}$，则对于该神经元的第$j$个突触，其权重变化值为
+
+$$Δw_{ij}=\sum_{t_{j}∈\vec{t}_{j}}{\sum_{t_{i}∈\vec{t}_{i}}W(t_{i}-t_{j})}$$
+
+其中STDP函数$W(x)$一般定义如下：
+
+$$
+W(x)=\left\{
+\begin{aligned}
+A_{+}e^{-\frac{x}{τ_{+}}},x>0 \\\\
+0,x=0 \\\\
+-A_{-}e^{\frac{x}{τ_{-}}},x<0
+\end{aligned}
+\right.
+$$
+
+其中$A_{+}$、$A_{-}$、$τ_{+}$、$τ_{-}$均为需设定的参数。
+
+STDP可以用python模拟如下：
+
+```python
+import math
+import torch
+
+def STDP(input_shape: int, output_shape: int, time_steps: int, input_spike_train: torch.tensor, output_spike_train: torch.tensor, weight_matrix: torch.tensor, max_weight: float, a_pos: float, a_neg: float, tau_pos: float, tau_neg: float):
+    """
+    通过STDP更新权重
+    @params:
+        input_shape: int 输入长度j（该层每个神经元突触长度）
+        output_shape: int 输出长度i（该层神经元长度）
+        time_steps: int 总时间步长t
+        input_spike_train: torch.tensor 输入脉冲序列，一个形状为j×t的矩阵，每个元素0代表无脉冲，1代表有脉冲
+        output_spike_train: torch.tensor 输出脉冲序列，一个形状为i×t的矩阵，每个元素0代表无脉冲，1代表有脉冲
+        weight_matrix: torch.tensor 权重矩阵，一个形状为i×j的矩阵
+        max_weight: float 最大权重
+        a_pos: 参数A+
+        a_neg: 参数A-
+        tau_pos: 参数τ+
+        tau_neg: 参数τ-
+    @return:
+        torch.tensor 更新后的权重矩阵
+    """
+    for i in range(output_shape):
+        for j in range(input_shape):
+            delta_w = 0.0
+            for tj in range(time_steps):
+                if input_spike_train[j, tj]:
+                    for ti in range(time_steps):
+                        if output_spike_train[i, ti]:
+                            delta_t = ti - tj
+                            if delta_t == 0:
+                                delta_w += 0
+                            elif delta_t > 0:
+                                delta_w += a_pos * math.exp(-delta_t / tau_pos)
+                            elif delta_t < 0:
+                                delta_w += -a_neg * math.exp(delta_t / tau_neg)
+            weight_matrix[i, j] += delta_w
+    return weight_matrix
+```
 
 ### 3.2 间接监督学习
 
@@ -430,9 +494,9 @@ SNN的参数要经过训练，才能完美地完成我们所给予的任务。SN
 
 #### 3.3.1 STBP与BPTT
 
-## 4 SNN的硬件部署
+## 4 脉冲神经网络的硬件部署
 
-### 4.1 SNN以IIR的形式部署
+### 4.1 脉冲神经网络以IIR的形式部署
 
 ### 4.2 时空代数与时空计算网络
 
@@ -451,3 +515,7 @@ SNN的参数要经过训练，才能完美地完成我们所给予的任务。SN
 [6] Gerstner W, Kistler W M. Spiking neuron models: Single neurons, populations, plasticity[M]. Cambridge university press, 2002.
 
 [7] Wu Z, Zhang H, Lin Y, et al. Liaf-net: Leaky integrate and analog fire network for lightweight and efficient spatiotemporal information processing[J]. IEEE Transactions on Neural Networks and Learning Systems, 2021, 33(11): 6249-6262.
+
+[8]Dan Y, Poo M. Spike timing-dependent plasticity of neural circuits[J]. Neuron, 2004, 44(1): 23-30.
+
+[9]Jesper Sjöström, Wulfram Gerstner. Spike-timing dependent plasticity[J]. Scholarpedia, 5(2):1362.
