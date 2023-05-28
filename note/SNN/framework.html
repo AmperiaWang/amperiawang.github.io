@@ -39,7 +39,7 @@
         <div id="content" class="mdui-typo">
             <h1 id="_1">脉冲神经网络知识体系</h1>
 <h2 id="1">1 脉冲神经网络的编码方式</h2>
-<p>不同于ANN的是，脉冲神经网络（SNN）中的值以脉冲的形式传递。将数值转为脉冲的过程被称作编码（encoding）。在脉冲神经网络中，根据信息编码为脉冲时所利用到的属性的不同，可以将编码方式分为以下几种：</p>
+<p>不同于模拟神经网络（ANN）的是，脉冲神经网络（SNN）中的值以脉冲的形式传递。将数值转为脉冲的过程被称作编码（encoding）。在脉冲神经网络中，根据信息编码为脉冲时所利用到的属性的不同，可以将编码方式分为以下几种：</p>
 <h3 id="11">1.1 速率编码</h3>
 <p>速率编码设想神经元的放电（即脉冲）频率隐含信息，因此以脉冲放电频率作为编码的基础。脉冲放电的频率越高，其所代表的值越大。$^{[1][2]}$</p>
 <p>$$
@@ -142,7 +142,12 @@ for i in range(time_steps):
 <li>鲁棒性不足：时间编码中时间所代表的值取决于每个脉冲与最早产生的脉冲之间的相对时间差，当最早产生的脉冲易主时，整个脉冲所包含的时间会随之变化。</li>
 </ol>
 <h2 id="2">2 脉冲神经网络神经元的类型</h2>
-<p>与ANN相似的是，脉冲神经网络的组成也是由神经元组成层，再由层组成整个脉冲神经网络计算网络。脉冲神经网络中神经元的选择也尤为关键。神经元的目的是处理输入的脉冲，并且由输入的脉冲产生对应输出的脉冲。根据内部运算方式的不同，神经元模型可以被分为如下几种。其中由于脉冲神经网络中神经元的生物学原理相似，每种神经元之间都能找到相对应的共有的结构或模式，但每种神经元彼此之间又不尽相同：</p>
+<p>与模拟神经网络相似的是，脉冲神经网络的组成也是由神经元组成层，再由层组成整个脉冲神经网络计算网络。脉冲神经网络中神经元的选择也尤为关键。神经元的目的是处理输入的脉冲，并且由输入的脉冲产生对应输出的脉冲。根据内部运算方式的不同，神经元模型可以被分为如下几种。其中由于脉冲神经网络中神经元的生物学原理相似，每种神经元之间都能找到相对应的共有的结构或模式，但每种神经元彼此之间又不尽相同。</p>
+<p>在以下第2章和第3章对神经元模型及学习规则的描述中，规定以下符号：</p>
+<p>（1）使用$O_{i}^{l}(t)$表示位于第$l$层的第$i$个神经元在第$t$个时间刻的脉冲输出；</p>
+<p>（2）使用$U_{i}^{l}(t)$表示位于第$l$层的第$i$个神经元在第$t$个时间刻的神经元电位值；</p>
+<p>（3）使用$X_{i}^{l}(t)$表示位于第$l$层的第$i$个神经元在第$t$个时间刻的模拟输出；</p>
+<p>（4）使用$H_{i}^{l}(t)$表示位于第$l$层的第$i$个神经元在第$t$个时间刻的历史遗留电位。</p>
 <h3 id="21-hh">2.1 霍奇金-赫胥黎神经元模型（HH模型）</h3>
 <p>HH模型将细胞膜看作一个具有膜电容$C_{M}$和泄露电导$G_{M}$的模型，由于细胞膜内外离子浓度的不同，细胞膜会维持在一个静息电位$V_{rest}$。离子$K^{+}$和$Na^{+}$的流动也会对膜电位产生一定影响。可将其总结为如下公式：$^{[4]}$</p>
 <p>$$I_{m}=C_{m}\frac{dV_{m}}{dt}+I_{Na}+I_{K}+I_{l}$$</p>
@@ -318,17 +323,11 @@ if __name__ == &quot;__main__&quot;:
 class Heaviside(torch.autograd.Function): 
     @staticmethod
     def forward(ctx, i):
-        &quot;&quot;&quot;
-        阶跃函数前向传播公式
-        &quot;&quot;&quot;
         ctx.save_for_backward(i)
         return i.gt(0).float()
 
     @staticmethod
     def backward(ctx, g_o):
-        &quot;&quot;&quot;
-        阶跃函数反向传播公式
-        &quot;&quot;&quot;
         i = ctx.saved_tensors
         g_i = g_o.clone() 
         temp = abs(i) &lt; 0.5
@@ -372,7 +371,7 @@ if __name__ == &quot;__main__&quot;:
         print(output_spikes)
 </code></pre>
 <h2 id="3">3 脉冲神经网络的学习方式</h2>
-<p>脉冲神经网络的参数要经过训练，才能完美地完成我们所给予的任务。脉冲神经网络的训练方式多种多样。此处采取Wu等人（2018）的分类方式，将脉冲神经网络的训练分为如下三类：</p>
+<p>脉冲神经网络的参数要经过训练，才能完美地完成我们所给予的任务。脉冲神经网络的训练方式多种多样。此处采取Wu等人（2018）的分类方式，将脉冲神经网络的训练分为如下三类：$^{[10]}$</p>
 <h3 id="31">3.1 无监督学习</h3>
 <p>无监督学习旨在通过观察每个神经元自己的输入与输出来自动调整每个神经元的权重，以对不同的输入模式做不同的响应。在这之中，最典型的无监督学习方式就是STDP。</p>
 <h4 id="311">3.1.1 脉冲时序依赖可塑性</h4>
@@ -381,7 +380,8 @@ if __name__ == &quot;__main__&quot;:
 <p>$$\Delta w_{ij}=\sum_{t_{j}∈\vec{t}_{j}}{\sum_{t_{i}∈\vec{t}_{i}}W(t_{i}-t_{j})}$$</p>
 <p>其中STDP函数$W(x)$一般定义如下：</p>
 <p>$$
-W(x)=\left\{
+W(x)=
+\left\{
 \begin{aligned}
 A_{+}e^{-\frac{x}{\tau _{+}}},x&gt; 0 \\\\
 0,x=0 \\\\
@@ -390,6 +390,7 @@ A_{+}e^{-\frac{x}{\tau _{+}}},x&gt; 0 \\\\
 \right.
 $$</p>
 <p>其中$A_{+}$、$A_{-}$、$\tau _{+}$、$\tau _{-}$均为需设定的参数。</p>
+<p><img alt="脉冲时序依赖可塑性（STDP）示意图" src="./assets/1-5.jpg" /></p>
 <p>STDP可以用python模拟如下：</p>
 <pre><code class="language-python">import math
 import torch
@@ -432,9 +433,102 @@ def STDP(input_shape: int, output_shape: int, time_steps: int, input_spike_train
 <h3 id="32">3.2 间接监督学习</h3>
 <p>间接监督学习并非直接训练脉冲神经网络，而是通过其它方式训练网络，再将训练好的网络或参数置入脉冲神经网络之中。其中最典型的方法即为ANN转SNN。</p>
 <h4 id="321-annsnn">3.2.1 ANN转SNN</h4>
+<p>Rueckauer等人（2017）的工作表明，脉冲神经网络中的IF神经元是ReLU激活函数在时间上的无偏估计。$^{[11]}$</p>
+<p><img alt="IF神经元脉冲发放率与输入的比值，与ReLU函数进行比较" src="./assets/1-6.png" /></p>
+<p>由于脉冲发放率的取值范围为$[0,1]$，因此在ANN转SNN时，还要对各个参数进行归一化。假设模拟神经网络中输入张量的最大值为$\lambda _{pre}$，输出张量的最大值为$\lambda $，则归一化后的权重为</p>
+<p>$$\hat{W}=W\frac{\lambda _{pre}}{\lambda }$$</p>
+<p>$$\hat{b}=\frac{b}{\lambda }$$</p>
+<p>使用<a href="https://github.com/fangwei123456/spikingjelly">spikingjelly</a>完成从ANN到SNN的转换：</p>
+<pre><code class="language-python">import torch
+from torch import nn
+
+class ANN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.network = nn.Sequential(
+            nn.Conv2d(1, 32, 3, 1),
+            nn.BatchNorm2d(32, eps=1e-3),
+            nn.ReLU(),
+            nn.AvgPool2d(2, 2),
+
+            nn.Conv2d(32, 32, 3, 1),
+            nn.BatchNorm2d(32, eps=1e-3),
+            nn.ReLU(),
+            nn.AvgPool2d(2, 2),
+
+            nn.Conv2d(32, 32, 3, 1),
+            nn.BatchNorm2d(32, eps=1e-3),
+            nn.ReLU(),
+            nn.AvgPool2d(2, 2),
+
+            nn.Flatten(),
+            nn.Linear(32, 10),
+            nn.ReLU()
+        )
+
+    def forward(self,x):
+        x = self.network(x)
+        return x
+
+model = ANN()
+</code></pre>
+<p>省略训练过程。</p>
+<pre><code class="language-python">model_converter = ann2snn.Converter(mode='max', dataloader=train_data_loader)
+snn_model = model_converter(model)
+</code></pre>
+<p>可以得到最终转换而成的脉冲神经网络模型：</p>
+<pre><code class="language-python">ANN(
+  (network): Module(
+    (0): Conv2d(1, 32, kernel_size=(3, 3), stride=(1, 1))
+    (3): AvgPool2d(kernel_size=2, stride=2, padding=0)
+    (4): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1))
+    (7): AvgPool2d(kernel_size=2, stride=2, padding=0)
+    (8): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1))
+    (11): AvgPool2d(kernel_size=2, stride=2, padding=0)
+    (12): Flatten(start_dim=1, end_dim=-1)
+    (13): Linear(in_features=32, out_features=10, bias=True)
+    (15): Softmax(dim=1)
+  )
+  (snn tailor): Module(
+    (0): Module(
+      (0): VoltageScaler(0.240048)
+      (1): IFNode(
+        v_threshold=1.0, v_reset=None, detach_reset=False, step_mode=s, backend=torch
+        (surrogate_function): Sigmoid(alpha=4.0, spiking=True)
+      )
+      (2): VoltageScaler(4.165831)
+    )
+    (1): Module(
+      (0): VoltageScaler(0.307485)
+      (1): IFNode(
+        v_threshold=1.0, v_reset=None, detach_reset=False, step_mode=s, backend=torch
+        (surrogate_function): Sigmoid(alpha=4.0, spiking=True)
+      )
+      (2): VoltageScaler(3.252196)
+    )
+    (2): Module(
+      (0): VoltageScaler(0.141659)
+      (1): IFNode(
+        v_threshold=1.0, v_reset=None, detach_reset=False, step_mode=s, backend=torch
+        (surrogate_function): Sigmoid(alpha=4.0, spiking=True)
+      )
+      (2): VoltageScaler(7.059210)
+    )
+    (3): Module(
+      (0): VoltageScaler(0.060785)
+      (1): IFNode(
+        v_threshold=1.0, v_reset=None, detach_reset=False, step_mode=s, backend=torch
+        (surrogate_function): Sigmoid(alpha=4.0, spiking=True)
+      )
+      (2): VoltageScaler(16.451399)
+    )
+  )
+)
+</code></pre>
+<p>由于通过ANN转SNN方法可以将对于脉冲神经网络的训练转为对于模拟神经网络的训练，此处不再赘述训练方式。</p>
 <h3 id="33">3.3 直接监督学习</h3>
 <h4 id="331-">3.3.1 时间-空间反向传播</h4>
-<p>时间-空间反向传播（Spatio-Temporal Backpropagation, STBP）利用LIF神经元中关于电位、脉冲之间的内在关系，将传统的反向传播应用在基于时间-空间结构的脉冲神经网络中。</p>
+<p>时间-空间反向传播（Spatio-Temporal Backpropagation, STBP）由Wu等人（2018）提出，利用LIF神经元中关于电位、脉冲之间的内在关系，将传统的反向传播应用在基于时间-空间结构的脉冲神经网络中。$^{[10]}$</p>
 <p>回顾描述LIF神经元的数学公式：</p>
 <p>$$U_{i}^{l}(t)=\sum_{j}{w_{ij}O_{j}^{l-1}(t)}+b_{i}+H_{i}^{l}(t)$$</p>
 <p>$$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$</p>
@@ -444,6 +538,7 @@ def STDP(input_shape: int, output_shape: int, time_steps: int, input_spike_train
 <p>$$\frac{\partial O_{i}^{l}(t)}{\partial U_{i}^{l}(t)}=\frac{\partial u}{\partial U_{i}^{l}(t)}$$</p>
 <p>$$\frac{\partial U_{i}^{l}(t)}{\partial U_{i}^{l}(t-1)}=\tau [1-O_{i}^{l}(t-1)]$$</p>
 <p>$$\frac{\partial O_{i}^{l}(t)}{\partial O_{i}^{l}(t-1)}=\frac{\partial O_{i}^{l}(t)}{\partial U_{i}^{l}(t)}\frac{\partial U_{i}^{l}(t)}{\partial O_{i}^{l}(t-1)}=-\tau U_{i}^{l}(t-1)\frac{\partial u}{\partial U_{i}^{l}(t)}$$</p>
+<p><img alt="时间-空间反向传播（STBP）示意图" src="./assets/1-7.png" /></p>
 <p>设损失为均方差损失：</p>
 <p>$$L=\frac{1}{2S}\sum_{s=1}^{S}{||y_{s}-\frac{1}{T}\sum_{t=1}^{T}{O_{s}^{N}(t)}||}_{2}^{2}$$</p>
 <p>则：</p>
@@ -464,11 +559,59 @@ def STDP(input_shape: int, output_shape: int, time_steps: int, input_spike_train
 <p>随后，便可根据$\frac{\partial L}{\partial O_{i}^{l}(t)}$和$\frac{\partial L}{\partial U_{i}^{l}(t)}$计算$\frac{\partial L}{\partial b^{l}}$与$\frac{\partial L}{\partial w^{l}}$：</p>
 <p>$$\frac{\partial L}{\partial b_{i}^{l}}=\sum_{t=1}^{T}{\frac{\partial L}{\partial U_{i}^{l}(t)}\frac{\partial U_{i}^{l}(t)}{\partial b_{i}^{l}}}=\sum_{t=1}^{T}{\frac{\partial L}{\partial U_{i}^{l}(t)}}$$</p>
 <p>$$\frac{\partial L}{\partial w_{ij}^{l}}=\sum_{t=1}^{T}{\frac{\partial L}{\partial U_{i}^{l}(t)}\frac{\partial U_{i}^{l}(t)}{\partial w_{ij}^{l}}}=\sum_{t=1}^{T}{\frac{\partial L}{\partial U_{i}^{l}(t)}O_{j}^{l-1}(t)}$$</p>
-<p>由此便可更新整个脉冲神经网络的参数。由于此算法可借助pytorch中的自动求导实现，因此此处不再给出具体实现方式。可以参考代码仓库<a href="https://github.com/yjwu17/STBP-for-training-SpikingNN">https://github.com/yjwu17/STBP-for-training-SpikingNN</a>。</p>
+<p>由此便可更新整个脉冲神经网络的参数。</p>
+<p>对于不可导的Heaviside阶跃函数$u(·)$，使用它的导数近似。STBP的原文中给出了4种Heaviside阶跃函数的导数近似：</p>
+<p>（1）矩形函数：</p>
+<p>$$\frac{\partial u}{\partial x}=\frac{1}{a}sign(|x|&lt; \frac{a}{2})$$</p>
+<p>（2）多项式函数：</p>
+<p>$$\frac{\partial u}{\partial x}=(\frac{\sqrt{a}}{2}-\frac{a}{4}|x|)sign(\frac{2}{\sqrt{a}}-|x|)$$</p>
+<p>（3）sigmoid函数导数：</p>
+<p>$$\frac{\partial u}{\partial x}=\frac{1}{a}\frac{e^{-\frac{x}{a}}}{(1+e^{-\frac{x}{a}})^{2}}$$</p>
+<p>（4）高斯分布函数：</p>
+<p>$$\frac{\partial u}{\partial x}=\frac{1}{\sqrt{2\pi a}}e^{-\frac{x^{2}}{2a}}$$</p>
+<p>由于此算法可借助pytorch中的自动求导实现，因此此处不再给出具体实现方式。可以参考代码仓库<a href="https://github.com/yjwu17/STBP-for-training-SpikingNN">https://github.com/yjwu17/STBP-for-training-SpikingNN</a>。</p>
 <h4 id="332-bptt">3.3.2 BPTT</h4>
+<p>沿时间反向传播（Backpropagation Through Time, BPTT）最早由Paul提出（1990），用于训练循环神经网络。与STBP类似，BPTT利用循环神经网络的时间特性，在空间与时间两个维度进行反向传播。$^{[12]}$在RNN上适用的BPTT在脉冲神经网络上同样使用。以下以BPTT在LIAF中的应用举例：$^{[7]}$</p>
+<p>回顾描述LIAF神经元的数学公式：</p>
+<p>$$U_{i}^{l}(t)=\sum_{j}{w_{ij}X_{j}^{l-1}(t)}+H_{i}^{l}(t)$$</p>
+<p>$$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$</p>
+<p>$$H_{i}^{l}(t)=\alpha [u_{reset}O_{i}^{l}(t-1)+U_{i}^{l}(t-1)[1-O_{i}^{l}(t-1)]]+\beta $$</p>
+<p>$$X_{i}^{l}(t)=f[U_{i}^{l}(t),u_{th}]$$</p>
+<p>根据链式求导法则，可以推得：</p>
+<p>$$\frac{\partial U_{i}^{l}(t)}{\partial U_{i}^{l}(t-1)}=\frac{\partial U_{i}^{l}(t)}{\partial H_{i}^{l}(t)}\frac{\partial H_{i}^{l}(t)}{\partial U_{i}^{l}(t-1)}=\alpha [u_{reset}-U_{i}^{l}(t-1)]\frac{\partial u}{\partial U_{i}^{l}(t-1)}+\alpha [1-u[U_{i}^{l}(t-1)]]$$</p>
+<p>$$\frac{\partial U_{i}^{l}(t)}{\partial U_{j}^{l-1}(t)}=\frac{\partial U_{i}^{l}(t)}{\partial X_{j}^{l-1}(t)}\frac{\partial X_{j}^{l-1}(t)}{\partial U_{j}^{l-1}(t)}=w_{ij}\frac{\partial f}{\partial U_{j}^{l-1}(t)}$$</p>
+<p>通过这种方式，可以进行类似于STBP的反向传播，将损失传播至整个网络与整个时间步之中，进而实现参数的更新。</p>
+<p>$$\frac{\partial L}{\partial w_{ij}^{l}}=\frac{\partial L}{\partial U_{i}^{l}(t)}\frac{\partial U_{i}^{l}(t)}{\partial w_{ij}^{l}}=\frac{\partial L}{\partial U_{i}^{l}(t)}X_{j}^{l-1}(t)$$</p>
+<p>对于不可导的Heaviside阶跃函数$u(·)$，使用它的导数近似：</p>
+<p>$$
+\frac{\partial u}{\partial x}=
+\left\{
+\begin{aligned}
+1,|x|&lt; \mu  \\\\
+0,otherwise
+\end{aligned}
+\right.
+$$</p>
+<p>其中$\mu $为微小正数。</p>
 <h2 id="4">4 脉冲神经网络的硬件部署</h2>
+<p>作为第三代神经网络，脉冲神经网络的计算不同于传统模拟神经网络中对模拟数值的线性运算。脉冲神经网络中的计算涉及到各个神经元的电位累积、激发、重置与泄露过程，因此基于传统模拟计算实现的脉冲神经网络皆为模拟的神经元。如何将脉冲神经网络的计算过程在电路上实现出来，一直是备受关注的研究课题。本节所讨论的即为脉冲神经网络在硬件上的部署。</p>
 <h3 id="41-iir">4.1 脉冲神经网络以IIR的形式部署</h3>
-<h3 id="42">4.2 时空代数与时空计算网络</h3>
+<p>Fang等人（2020）在FPGA上以无限冲激响应（IIR）滤波器的形式将脉冲神经网络部署在FPGA上，并取得了不错的成果。$^{[13]}$他们将SNN中的SRM0神经元：</p>
+<p>（1）胞体内的电位变化由胞体的历史电位，输入导致的电位变化与重置导致的电位变化叠加而成</p>
+<p>$$U_{i}^{l}(t)=\lambda U_{i}^{l}(t-1)+I_{i}^{l}(t)-\theta _{r}R_{i}^{l}(t)$$</p>
+<p>（2）其中输入导致的电位变化由各个突触的反应函数叠加而成</p>
+<p>$$I_{i}^{l}(t)=\sum_{j}{w_{ij}^{l}U_{ij}^{l}(t)}$$</p>
+<p>（3）将重置看作一个反向的电位变化</p>
+<p>$$R_{i}^{l}(t)=\theta R_{i}^{l}(t-1)+O_{i}^{l}(t)$$</p>
+<p>（4）各个突触的反应函数</p>
+<p>$$U_{ij}^{l}(t)=\sum_{p=1}^{P}{\alpha _{j,p}^{l}U_{ij}^{l}(t-p)}+\sum_{q=0}^{Q}{\beta _{j,q}^{l}O_{j}^{l-1}(t-q)}$$</p>
+<p>（5）该神经元是否产生脉冲由胞体电位经过Heaviside阶跃函数$u(·)$决定</p>
+<p>$$O_{i}^{l}(t)=u[U_{i}^{l}(t)-u_{th}]$$</p>
+<p>其中，涉及到时间序列的方程，如（1）（3）（4），都可以将其看作一个IIR滤波器来进行计算。由此可以得出使用IIR滤波器构建的SRM0神经元如下图所示：</p>
+<p><img alt="使用IIR滤波器构造SRM0神经元（算法实现）" src="./assets/1-8.png" /></p>
+<p><img alt="使用IIR滤波器构造SRM0神经元（硬件实现）" src="./assets/1-9.png" /></p>
+<p>借此，可以构造基于IIR滤波器的脉冲神经网络，进而实现脉冲神经网络的硬件级加速。</p>
+<h3 id="42">4.2 敬请期待</h3>
 <h2 id="_2">参考文献</h2>
 <p>[1] Smith J E. Space-time computing with temporal neural networks[J]. Synthesis Lectures on Computer Architecture, 2017, 12(2): i-215.</p>
 <p>[2] Fidjeland A K, Roesch E B, Shanahan M P, et al. NeMo: a platform for neural modelling of spiking neurons using GPUs[C]//2009 20th IEEE international conference on application-specific systems, architectures and processors. IEEE, 2009: 137-144.</p>
@@ -477,8 +620,12 @@ def STDP(input_shape: int, output_shape: int, time_steps: int, input_spike_train
 <p>[5] Smith J E. Efficient digital neurons for large scale cortical architectures[J]. ACM SIGARCH Computer Architecture News, 2014, 42(3): 229-240.</p>
 <p>[6] Gerstner W, Kistler W M. Spiking neuron models: Single neurons, populations, plasticity[M]. Cambridge university press, 2002.</p>
 <p>[7] Wu Z, Zhang H, Lin Y, et al. Liaf-net: Leaky integrate and analog fire network for lightweight and efficient spatiotemporal information processing[J]. IEEE Transactions on Neural Networks and Learning Systems, 2021, 33(11): 6249-6262.</p>
-<p>[8]Dan Y, Poo M. Spike timing-dependent plasticity of neural circuits[J]. Neuron, 2004, 44(1): 23-30.</p>
-<p>[9]Jesper Sjöström, Wulfram Gerstner. Spike-timing dependent plasticity[J]. Scholarpedia, 5(2):1362.</p>
+<p>[8] Dan Y, Poo M. Spike timing-dependent plasticity of neural circuits[J]. Neuron, 2004, 44(1): 23-30.</p>
+<p>[9] Jesper Sjöström, Wulfram Gerstner. Spike-timing dependent plasticity[J]. Scholarpedia, 5(2):1362.</p>
+<p>[10] Wu Y, Deng L, Li G, et al. Spatio-temporal backpropagation for training high-performance spiking neural networks[J]. Frontiers in neuroscience, 2018, 12: 331.</p>
+<p>[11] Rueckauer B, Lungu I A, Hu Y, et al. Conversion of continuous-valued deep networks to efficient event-driven networks for image classification[J]. Frontiers in neuroscience, 2017, 11: 682.</p>
+<p>[12] Werbos P J. Backpropagation through time: what it does and how to do it[J]. Proceedings of the IEEE, 1990, 78(10): 1550-1560.</p>
+<p>[13] Fang H, Mei Z, Shrestha A, et al. Encoding, model, and architecture: Systematic optimization for spiking neural network in FPGAs[C]//Proceedings of the 39th International Conference on Computer-Aided Design. 2020: 1-9.</p>
         </div>
     </div>
 
