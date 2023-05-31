@@ -224,16 +224,16 @@ import torch
 
 class Heaviside(torch.autograd.Function): 
     @staticmethod
-    def forward(ctx, i):
-        ctx.save_for_backward(i)
-        return i.gt(0).float()
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return x.gt(0).float()
 
     @staticmethod
-    def backward(ctx, g_o):
-        i = ctx.saved_tensors
-        g_i = g_o.clone() 
-        temp = abs(i) < 0.5
-        return g_i * temp.float(), None
+    def backward(ctx, grad_output):
+        x = ctx.saved_tensors[0]
+        grad_input = grad_output.clone() 
+        temp = torch.abs(x) < 0.5
+        return grad_input * temp.float()
 
 class LIF(torch.nn.Module):
     def __init__(self, input_shape: int, output_shape: int, max_weight: float, bias: float, threshold: float, tau: float, weights: torch.tensor = None):
@@ -241,13 +241,13 @@ class LIF(torch.nn.Module):
         self.input_shape = input_shape
         self.output_shape = output_shape
         self.max_weight = max_weight
-        self.bias = bias
+        self.bias = torch.nn.Parameter(bias)
         self.threshold = threshold
         self.tau = tau
         if weights is None:
-            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+            self.weights = torch.nn.Parameter(torch.rand(self.output_shape, self.input_shape) * max_weight)
         else:
-            self.weights = weights
+            self.weights = torch.nn.Parameter(weights)
         self.history = torch.zeros(self.output_shape)
 
     def forward(self, x):
@@ -308,16 +308,16 @@ import torch
 
 class Heaviside(torch.autograd.Function): 
     @staticmethod
-    def forward(ctx, i):
-        ctx.save_for_backward(i)
-        return i.gt(0).float()
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return x.gt(0).float()
 
     @staticmethod
-    def backward(ctx, g_o):
-        i = ctx.saved_tensors
-        g_i = g_o.clone() 
-        temp = abs(i) < 0.5
-        return g_i * temp.float(), None
+    def backward(ctx, grad_output):
+        x = ctx.saved_tensors[0]
+        grad_input = grad_output.clone() 
+        temp = torch.abs(x) < 0.5
+        return grad_input * temp.float()
 
 class SRM0(torch.nn.Module):
     def __init__(self, input_shape: int, output_shape: int, max_weight: float, threshold: float, tau: float, weights: torch.tensor = None):
@@ -329,9 +329,9 @@ class SRM0(torch.nn.Module):
         self.sigma = torch.ones(self.input_shape, 1)
         self.tau = tau
         if weights is None:
-            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+            self.weights = torch.nn.Parameter(torch.rand(self.output_shape, self.input_shape) * max_weight)
         else:
-            self.weights = weights
+            self.weights = torch.nn.Parameter(weights)
         self.history = torch.zeros(self.output_shape, self.input_shape)
 
     def forward(self, x):
@@ -393,16 +393,16 @@ import torch
 
 class Heaviside(torch.autograd.Function): 
     @staticmethod
-    def forward(ctx, i):
-        ctx.save_for_backward(i)
-        return i.gt(0).float()
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return x.gt(0).float()
 
     @staticmethod
-    def backward(ctx, g_o):
-        i = ctx.saved_tensors
-        g_i = g_o.clone() 
-        temp = abs(i) < 0.5
-        return g_i * temp.float(), None
+    def backward(ctx, grad_output):
+        x = ctx.saved_tensors[0]
+        grad_input = grad_output.clone() 
+        temp = torch.abs(x) < 0.5
+        return grad_input * temp.float()
 
 class LIAF(torch.nn.Module):
     def __init__(self, input_shape: int, output_shape: int, max_weight: float, threshold: float, alpha: float, beta: float, act_fun: torch.nn.Module = torch.nn.ReLU(), weights: torch.tensor = None):
@@ -415,9 +415,9 @@ class LIAF(torch.nn.Module):
         self.beta = beta
         self.act_fun = act_fun
         if weights is None:
-            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+            self.weights = torch.nn.Parameter(torch.rand(self.output_shape, self.input_shape) * max_weight)
         else:
-            self.weights = weights
+            self.weights = torch.nn.Parameter(weights)
         self.history = torch.zeros(self.output_shape)
 
     def forward(self, x):
