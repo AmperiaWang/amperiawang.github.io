@@ -1,8 +1,8 @@
 # 脉冲神经网络知识体系
 
-## 1 脉冲神经网络的编码方式
+## 1 脉冲神经网络的编码机制
 
-不同于模拟神经网络（ANN）的是，脉冲神经网络（SNN）中的值以脉冲的形式传递。将数值转为脉冲的过程被称作编码（encoding）。在脉冲神经网络中，根据信息编码为脉冲时所利用到的属性的不同，可以将编码方式分为以下几种：
+不同于模拟神经网络（ANN）的是，脉冲神经网络（SNN）中的值以脉冲的形式传递。将数值转为脉冲的过程被称作编码（encoding）。在脉冲神经网络中，根据信息编码为脉冲时所利用到的属性的不同，可以将编码机制分为以下几种：
 
 ### 1.1 速率编码
 
@@ -133,7 +133,7 @@ for i in range(time_steps):
 
 与模拟神经网络相似的是，脉冲神经网络的组成也是由神经元组成层，再由层组成整个脉冲神经网络计算网络。脉冲神经网络中神经元的选择也尤为关键。神经元的目的是处理输入的脉冲，并且由输入的脉冲产生对应输出的脉冲。根据内部运算方式的不同，神经元模型可以被分为如下几种。其中由于脉冲神经网络中神经元的生物学原理相似，每种神经元之间都能找到相对应的共有的结构或模式，但每种神经元彼此之间又不尽相同。
 
-在以下第2章和第3章对神经元模型及学习规则的描述中，规定以下符号：
+在以下第2章和第3章对神经元模型及训练的描述中，规定以下符号：
 
 （1）使用$O_{i}^{l}(t)$表示位于第$l$层的第$i$个神经元在第$t$个时间刻的脉冲输出；
 
@@ -165,7 +165,7 @@ $$I_{K}=g_{K}(V-E_{K})$$
 
 ![霍奇金-赫胥黎模型示意图](./assets/1-1.png)
 
-### 2.2 LIF模型
+### 2.2 Leaky Integrate and Fire（LIF）模型
 
 由HH模型我们得知，注入细胞的电流满足如下公式：
 
@@ -224,16 +224,16 @@ import torch
 
 class Heaviside(torch.autograd.Function): 
     @staticmethod
-    def forward(ctx, i):
-        ctx.save_for_backward(i)
-        return i.gt(0).float()
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return x.gt(0).float()
 
     @staticmethod
-    def backward(ctx, g_o):
-        i = ctx.saved_tensors
-        g_i = g_o.clone() 
-        temp = abs(i) < 0.5
-        return g_i * temp.float(), None
+    def backward(ctx, grad_output):
+        x = ctx.saved_tensors[0]
+        grad_input = grad_output.clone() 
+        temp = torch.abs(x) < 0.5
+        return grad_input * temp.float()
 
 class LIF(torch.nn.Module):
     def __init__(self, input_shape: int, output_shape: int, max_weight: float, bias: float, threshold: float, tau: float, weights: torch.tensor = None):
@@ -241,13 +241,13 @@ class LIF(torch.nn.Module):
         self.input_shape = input_shape
         self.output_shape = output_shape
         self.max_weight = max_weight
-        self.bias = bias
+        self.bias = torch.nn.Parameter(bias)
         self.threshold = threshold
         self.tau = tau
         if weights is None:
-            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+            self.weights = torch.nn.Parameter(torch.rand(self.output_shape, self.input_shape) * max_weight)
         else:
-            self.weights = weights
+            self.weights = torch.nn.Parameter(weights)
         self.history = torch.zeros(self.output_shape)
 
     def forward(self, x):
@@ -271,7 +271,7 @@ if __name__ == "__main__":
         print(output_spikes)
 ```
 
-### 2.3 SRM0模型
+### 2.3 Spike Response Model 0（SRM0）
 
 LIF模型的电位在神经元的胞体中累积并计算脉冲，而SRM0模型的电位在各个突触中累积并计算脉冲。在SRM0模型中，来自前一个神经元的脉冲在突触处累积电位，在胞体中加和并计算脉冲。
 
@@ -308,16 +308,16 @@ import torch
 
 class Heaviside(torch.autograd.Function): 
     @staticmethod
-    def forward(ctx, i):
-        ctx.save_for_backward(i)
-        return i.gt(0).float()
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return x.gt(0).float()
 
     @staticmethod
-    def backward(ctx, g_o):
-        i = ctx.saved_tensors
-        g_i = g_o.clone() 
-        temp = abs(i) < 0.5
-        return g_i * temp.float(), None
+    def backward(ctx, grad_output):
+        x = ctx.saved_tensors[0]
+        grad_input = grad_output.clone() 
+        temp = torch.abs(x) < 0.5
+        return grad_input * temp.float()
 
 class SRM0(torch.nn.Module):
     def __init__(self, input_shape: int, output_shape: int, max_weight: float, threshold: float, tau: float, weights: torch.tensor = None):
@@ -329,9 +329,9 @@ class SRM0(torch.nn.Module):
         self.sigma = torch.ones(self.input_shape, 1)
         self.tau = tau
         if weights is None:
-            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+            self.weights = torch.nn.Parameter(torch.rand(self.output_shape, self.input_shape) * max_weight)
         else:
-            self.weights = weights
+            self.weights = torch.nn.Parameter(weights)
         self.history = torch.zeros(self.output_shape, self.input_shape)
 
     def forward(self, x):
@@ -354,7 +354,7 @@ if __name__ == "__main__":
         print(output_spikes)
 ```
 
-### 2.4 LIAF模型
+### 2.4 Leaky Integrate and Analog Fire（LIAF）模型
 
 LIF模型的输入与输出均为脉冲，其在神经元中经历了电压积累与脉冲计算的过程；而LIAF模型的输入与输出均为模拟电位值，其神经元内部和LIF神经元类似，但输出的值为模拟电位$U_{i}^{l}(t)$。
 
@@ -393,16 +393,16 @@ import torch
 
 class Heaviside(torch.autograd.Function): 
     @staticmethod
-    def forward(ctx, i):
-        ctx.save_for_backward(i)
-        return i.gt(0).float()
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return x.gt(0).float()
 
     @staticmethod
-    def backward(ctx, g_o):
-        i = ctx.saved_tensors
-        g_i = g_o.clone() 
-        temp = abs(i) < 0.5
-        return g_i * temp.float(), None
+    def backward(ctx, grad_output):
+        x = ctx.saved_tensors[0]
+        grad_input = grad_output.clone() 
+        temp = torch.abs(x) < 0.5
+        return grad_input * temp.float()
 
 class LIAF(torch.nn.Module):
     def __init__(self, input_shape: int, output_shape: int, max_weight: float, threshold: float, alpha: float, beta: float, act_fun: torch.nn.Module = torch.nn.ReLU(), weights: torch.tensor = None):
@@ -415,9 +415,9 @@ class LIAF(torch.nn.Module):
         self.beta = beta
         self.act_fun = act_fun
         if weights is None:
-            self.weights = torch.rand(self.output_shape, self.input_shape) * max_weight
+            self.weights = torch.nn.Parameter(torch.rand(self.output_shape, self.input_shape) * max_weight)
         else:
-            self.weights = weights
+            self.weights = torch.nn.Parameter(weights)
         self.history = torch.zeros(self.output_shape)
 
     def forward(self, x):
@@ -442,7 +442,7 @@ if __name__ == "__main__":
         print(output_spikes)
 ```
 
-## 3 脉冲神经网络的学习方式
+## 3 脉冲神经网络的训练
 
 脉冲神经网络的参数要经过训练，才能完美地完成我们所给予的任务。脉冲神经网络的训练方式多种多样。此处采取Wu等人（2018）的分类方式，将脉冲神经网络的训练分为如下三类：$^{[10]}$
 
@@ -450,7 +450,7 @@ if __name__ == "__main__":
 
 无监督学习旨在通过观察每个神经元自己的输入与输出来自动调整每个神经元的权重，以对不同的输入模式做不同的响应。在这之中，最典型的无监督学习方式就是STDP。
 
-#### 3.1.1 脉冲时序依赖可塑性
+#### 3.1.1 脉冲时序依赖可塑性（STDP）
 
 脉冲时序依赖可塑性（Spike-timing Dependent Plasticity, STDP）可以用来训练脉冲神经网络的神经元。作为一个时许非对称形式的Hebb学习法则，其依赖突触前和突触后神经元脉冲之间的紧密时间相关性来进行训练。$^{[8],[9]}$
 
@@ -633,7 +633,7 @@ ANN(
 
 ### 3.3 直接监督学习
 
-#### 3.3.1 时间-空间反向传播
+#### 3.3.1 时间-空间反向传播（STBP）
 
 时间-空间反向传播（Spatio-Temporal Backpropagation, STBP）由Wu等人（2018）提出，利用LIF神经元中关于电位、脉冲之间的内在关系，将传统的反向传播应用在基于时间-空间结构的脉冲神经网络中。$^{[10]}$
 
@@ -719,7 +719,7 @@ $$\frac{\partial u}{\partial x}=\frac{1}{\sqrt{2πa}}e^{-\frac{x^{2}}{2a}}$$
 
 由于此算法可借助pytorch中的自动求导实现，因此此处不再给出具体实现方式。可以参考代码仓库[https://github.com/yjwu17/STBP-for-training-SpikingNN](https://github.com/yjwu17/STBP-for-training-SpikingNN)。
 
-#### 3.3.2 BPTT
+#### 3.3.2 沿时间反向传播（BPTT）
 
 沿时间反向传播（Backpropagation Through Time, BPTT）最早由Paul提出（1990），用于训练循环神经网络。与STBP类似，BPTT利用循环神经网络的时间特性，在空间与时间两个维度进行反向传播。$^{[12]}$在RNN上适用的BPTT在脉冲神经网络上同样使用。以下以BPTT在LIAF中的应用举例：$^{[7]}$
 
