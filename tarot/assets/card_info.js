@@ -425,7 +425,7 @@ var card_info = [
                 "name": "宝剑王牌",
                 "name_english": "Ace of Swords",
                 "image_file": "ace-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["清晰思考", "洞察力", "真相", "新思维"]
             },
@@ -433,7 +433,7 @@ var card_info = [
                 "name": "宝剑二",
                 "name_english": "Two of Swords",
                 "image_file": "two-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["犹豫", "权衡", "决策", "选择"]
             },
@@ -441,7 +441,7 @@ var card_info = [
                 "name": "宝剑三",
                 "name_english": "Three of Swords",
                 "image_file": "three-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["心痛", "失望", "痛苦", "分离"]
             },
@@ -449,7 +449,7 @@ var card_info = [
                 "name": "宝剑四",
                 "name_english": "Four of Swords",
                 "image_file": "four-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["休息", "恢复", "内在平静", "冥想"]
             },
@@ -457,7 +457,7 @@ var card_info = [
                 "name": "宝剑五",
                 "name_english": "Five of Swords",
                 "image_file": "five-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["失败", "争议", "失落", "胜者与失败者"]
             },
@@ -465,7 +465,7 @@ var card_info = [
                 "name": "宝剑六",
                 "name_english": "Six of Swords",
                 "image_file": "six-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["离开困境", "平静过渡", "旅程", "转变"]
             },
@@ -473,7 +473,7 @@ var card_info = [
                 "name": "宝剑七",
                 "name_english": "Seven of Swords",
                 "image_file": "seven-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["欺骗", "窃取", "隐秘行动", "防御"]
             },
@@ -481,7 +481,7 @@ var card_info = [
                 "name": "宝剑八",
                 "name_english": "Eight of Swords",
                 "image_file": "eight-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["束缚", "困惑", "无助", "限制"]
             },
@@ -489,7 +489,7 @@ var card_info = [
                 "name": "宝剑九",
                 "name_english": "Nine of Swords",
                 "image_file": "nine-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["焦虑", "恐惧", "噩梦", "内心痛苦"]
             },
@@ -497,7 +497,7 @@ var card_info = [
                 "name": "宝剑十",
                 "name_english": "Ten of Swords",
                 "image_file": "ten-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["背叛", "结束", "彻底失败", "重大改变"]
             },
@@ -505,7 +505,7 @@ var card_info = [
                 "name": "宝剑侍从",
                 "name_english": "Page of Swords",
                 "image_file": "page-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["观察", "学习", "好奇心", "警觉"]
             },
@@ -513,7 +513,7 @@ var card_info = [
                 "name": "宝剑骑士",
                 "name_english": "Knight of Swords",
                 "image_file": "knight-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["急躁", "行动", "冲突", "勇敢"]
             },
@@ -521,7 +521,7 @@ var card_info = [
                 "name": "宝剑皇后",
                 "name_english": "Queen of Swords",
                 "image_file": "queen-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["聪明", "判断力", "独立", "坚韧"]
             },
@@ -529,7 +529,7 @@ var card_info = [
                 "name": "宝剑国王",
                 "name_english": "King of Swords",
                 "image_file": "king-swords",
-                "symbol": "≋",
+                "symbol": "+",
                 "title": ["宝", "剑"],
                 "keywords": ["权威", "公正", "冷静", "思考"]
             }
