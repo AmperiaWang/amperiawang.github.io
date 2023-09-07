@@ -14,6 +14,7 @@
     <img class="page-background" src="./assets/images/background.jpg">
     <div class="card-bar"></div>
     <div class="card-stage">
+        <div class="card-symbol"></div>
         <div class="card-background-description">
             <div class="row">
                 <div id="desc-1" class="col background-desc"></div>
@@ -38,7 +39,7 @@
     </div>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script>
-        var class_bar, card_bar, background_desc, card_image, card_desc;
+        var class_bar, card_bar, background_desc, card_symbol, card_image, card_desc;
 
         var card_bar_img_template = '<img class="card-icon" src="{{src}}" title="{{title}}" onclick="select_card({{id}});">',
             card_img_template = '<img class="card-image {{reversed}}" src="{{src}}" onclick="highlight_card(this);" data-class="{{class}}" data-idx="{{id}}">',
@@ -126,6 +127,7 @@
             });
 
             background_desc.html("");
+            card_symbol.html("");
             card_desc.children().html("");
             if (current_selected_cards.length == 1) {
                 var card_el = current_selected_cards[0];
@@ -133,6 +135,7 @@
                 card["title"].forEach(function (chara, idx) {
                     background_desc.eq(idx).html(chara);
                 });
+                card_symbol.html(card["symbol"]);
                 card_desc.find(".card-title").html(card["name"]);
                 card_desc.find(".card-title-english").html(card["name_english"]);
                 card_desc.find(".card-desc").html(card["keywords"].join("、"));
@@ -143,6 +146,7 @@
             class_bar = $(".card-class-bar");
             card_bar = $(".card-bar");
             background_desc = $(".background-desc");
+            card_symbol = $(".card-symbol");
             card_image = $(".card-image-container");
             card_desc = $(".card-info");
 
