@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>塔罗牌</title>
+	<link rel="icon" href="./favicon.png" type="image/x-icon" />
+	<link rel="shortcut icon" href="./favicon.png" type="image/x-icon"/>
+    <link href="./assets/main.css" rel="stylesheet" type="text/css">
+    <script src="./assets/card_info.js"></script>
+</head>
+
+<body>
+    <img class="page-background" src="./assets/images/background.jpg">
+    <div class="card-bar"></div>
+    <div class="card-stage">
+        <div class="card-symbol"></div>
+        <div class="card-background-description">
+            <div class="row">
+                <div id="desc-1" class="col background-desc"></div>
+                <div id="desc-2" class="col background-desc"></div>
+            </div>
+            <div class="row">
+                <div id="desc-3" class="col background-desc"></div>
+                <div id="desc-4" class="col background-desc"></div>
+            </div>
+        </div>
+        <div class="card-image-container">
+        </div>
+        <div class="card-info">
+            <div class="card-title"></div>
+            <div class="card-title-english"></div>
+            <div class="card-desc"></div>
+        </div>
+    </div>
+    <div class="card-class-bar-container">
+        <div class="card-class-bar">
+        </div>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        var class_bar, card_bar, background_desc, card_symbol, card_image, card_desc;
+
+        var card_bar_img_template = '<img class="card-icon" src="{{src}}" title="{{title}}" onclick="select_card({{id}});">',
+            card_img_template = '<img class="card-image {{reversed}}" src="{{src}}" onclick="highlight_card(this);" data-class="{{class}}" data-idx="{{id}}">',
+            card_class_img_template = '<div class="card-class" onclick="switch_class({{id}});" title="{{name}}"><img src="./assets/images/{{folder}}.png" alt="{{name}}"/></div>';
+
+        var current_selected_class = 0,
+            current_selected_cards = [],
+            current_highlighted_card = 0;
+        
+        function switch_class(class_idx) {
+            current_selected_class = class_idx;
+            update_display();
+        }
+
+        function append_card(card_idx) {
+            var class_info = card_info[current_selected_class],
+                card = class_info["cards"][card_idx];
+            current_selected_cards.push($(card_img_template.replace(
+                /{{src}}/g, "./assets/images/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
+            ).replace(
+                /{{highlighted}}/g, ""
+            ).replace(
+                /{{class}}/g, current_selected_class
+            ).replace(
+                /{{id}}/g, card_idx
+            )));
+        }
+
+        function replace_card(card_idx) {
+            var class_info = card_info[current_selected_class],
+                card = class_info["cards"][card_idx];
+            current_selected_cards[current_highlighted_card] = $(card_img_template.replace(
+                /{{src}}/g, "./assets/images/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
+            ).replace(
+                /{{highlighted}}/g, "highlighted"
+            ).replace(
+                /{{class}}/g, current_selected_class
+            ).replace(
+                /{{id}}/g, card_idx
+            ));
+        }
+
+        function select_card(card_idx) {
+            if (current_highlighted_card >= 0) {
+                replace_card(card_idx);
+            } else {
+                append_card(card_idx);
+            }
+            update_display();
+        }
+
+        function highlight_card(card_el) {
+            $(card_el).toggleClass("reversed");
+        }
+
+        function update_display() {
+            var class_bar_html = "";
+            card_info.forEach(function(class_info, idx) {
+                class_bar_html += card_class_img_template.replace(
+                    /{{name}}/g, class_info["name"]
+                ).replace(
+                    /{{folder}}/g, class_info["folder"]
+                ).replace(
+                    /{{id}}/g, idx
+                );
+            });
+            class_bar.html(class_bar_html);
+
+            var class_info = card_info[current_selected_class];
+            var card_bar_html = "";
+            class_info["cards"].forEach(function (card, idx) {
+                card_bar_html += card_bar_img_template.replace(
+                    /{{src}}/g, "./assets/images/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
+                ).replace(
+                    /{{title}}/g, card["name"]
+                ).replace(
+                    /{{id}}/g, idx
+                );
+            });
+            card_bar.html(card_bar_html);
+
+            card_image.html("");
+            current_selected_cards.forEach(function (card_el, idx) {
+                card_image.append(card_el);
+            });
+
+            background_desc.html("");
+            card_symbol.html("");
+            card_desc.children().html("");
+            if (current_selected_cards.length == 1) {
+                var card_el = current_selected_cards[0];
+                var card = card_info[parseInt(card_el.data("class"))]["cards"][parseInt(card_el.data("idx"))];
+                card["title"].forEach(function (chara, idx) {
+                    background_desc.eq(idx).html(chara);
+                });
+                card_symbol.html(card["symbol"]);
+                card_desc.find(".card-title").html(card["name"]);
+                card_desc.find(".card-title-english").html(card["name_english"]);
+                card_desc.find(".card-desc").html(card["keywords"].join("、"));
+            }
+        }
+
+        $(document).ready(function () {
+            class_bar = $(".card-class-bar");
+            card_bar = $(".card-bar");
+            background_desc = $(".background-desc");
+            card_symbol = $(".card-symbol");
+            card_image = $(".card-image-container");
+            card_desc = $(".card-info");
+
+            append_card(0);
+            update_display();
+        });
+    </script>
+</body>
+
+</html>
