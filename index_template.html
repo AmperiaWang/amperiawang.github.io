@@ -8,22 +8,23 @@
         integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
 </head>
 
-<body class="mdui-bottom-nav-fixed mdui-theme-primary-light-green mdui-theme-accent-lime">
+<body class="mdui-bottom-nav-fixed mdui-theme-primary-light-green mdui-theme-accent-green">
     <div id="appbar" class="mdui-appbar">
         <div class="mdui-toolbar mdui-color-theme">
             <a href="/" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '主页'}">
                 <i class="mdui-icon material-icons">home</i>
             </a>
-            <a href="javascript:void(0);" class="mdui-typo-title">欢迎来到我的站点</a>
+            <a href="https://github.com/AmperiaWang" class="mdui-typo-title">
+                <img class="mdui-img-circle" src="https://avatars.githubusercontent.com/u/47077175?v=4"
+                    style="width: 2.5rem; height: 2.5rem; vertical-align: middle;" />
+                安培利亚
+            </a>
             <div class="mdui-toolbar-spacer"></div>
             <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '搜索'}">
                 <i class="mdui-icon material-icons">search</i>
             </a>
-            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '刷新'}">
+            <a href="javascript:location.reload();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '刷新'}">
                 <i class="mdui-icon material-icons">refresh</i>
-            </a>
-            <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '更多'}">
-                <i class="mdui-icon material-icons">more_vert</i>
             </a>
         </div>
     </div>
@@ -42,6 +43,49 @@
 
     <div class="mdui-container" style="padding-top: 2rem;">
         <div id="navigator">
+            <div id="personal-info" class="mdui-table-fluid mdui-typo">
+                <table class="mdui-table mdui-table-hoverable">
+                    <tbody>
+                        <tr>
+                            <td>
+                                现就读于
+                            </td>
+                            <td>
+                                西安交通大学
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                领域
+                            </td>
+                            <td>
+                                类脑计算（人工智能、机器学习）
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                擅长
+                            </td>
+                            <td>
+                                机器学习/深度学习的代码编写及训练、前后端代码编写与调试。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                联系方式
+                            </td>
+                            <td>
+                                邮箱：amperiawang@outlook.com
+                                <br>
+                                <a href="https://space.bilibili.com/6751159">
+                                    Bilibili：安培利亚
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mdui-typo-headline" style="padding-top: 2.5rem; padding-bottom: 1rem;">作品</div>
             <div class="mdui-row-xs-1 mdui-row-sm-1 mdui-row-md-2 mdui-row-lg-3 mdui-row-xl-4">
                 <div class="mdui-col">
                     <div class="mdui-card" style="margin: 1rem;">
@@ -81,7 +125,7 @@
     <div id="appbar-tab" class="mdui-tab mdui-bottom-nav">
         <a href="#navigator" class="mdui-ripple">
             <i class="mdui-icon material-icons mdui-center">apps</i>
-            <label>应用导航</label>
+            <label>个人简介</label>
         </a>
         <a href="#recommend" class="mdui-ripple">
             <i class="mdui-icon material-icons mdui-center">note</i>
@@ -107,7 +151,7 @@
 
         var appbarTab = new mdui.Tab("#appbar-tab");
         var bannerTitle = document.getElementById("banner-heading");
-        var titles = ["应用导航", "推荐阅读", "笔记整理"];
+        var titles = ["个人简介", "推荐阅读", "笔记整理"];
         bannerTitle.innerHTML = titles[0];
 
         appbarTab.$element[0].addEventListener("change.mdui.tab", function (event) {

@@ -180,6 +180,21 @@
 <p>$$\frac{dw_{m}}{dt}=a(bV_{m}-w_{m})$$</p>
 <p>其在QIF模型的基础上，增加了适应变量。其各个系数由对某个皮层神经元的拟合得出，在实际应用场景中，可以根据模型需要适当修改。</p>
         </div>
+        <div style="height: 5vh;"></div>
+        <div id="chapter-link" class="mdui-row">
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-left" disabled>
+                    <i class="mdui-icon material-icons">chevron_left</i>
+                    已经是第一章
+                </button>
+            </div>
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-right" disabled>
+                    已经是最后一章
+                    <i class="mdui-icon material-icons">chevron_right</i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="footer" style="padding: 2rem 0;">
@@ -196,6 +211,13 @@
     <script>
         function comingSoon() {
             mdui.snackbar("敬请期待");
+        }
+
+        function toChapter(path) {
+            pathList = window.location.href.split("/");
+            pathList.pop();
+            path = pathList.join("/") + "/" + path;
+            window.location.href = path;
         }
 
         function formatContent(node) {

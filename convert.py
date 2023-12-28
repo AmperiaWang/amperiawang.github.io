@@ -73,8 +73,37 @@ def convert(source, dest, path, template):
         elif os.path.isdir(source + path + fileName):
             os.mkdir(dest + path + fileName)
             menuList = menuList + convert(source, dest, path + fileName + "/", template)
-    if len(menu["list"]):
+    chapterLength = len(menu["list"])
+    if chapterLength:
         menuList.append(menu)
+        for idx, fileInfo in enumerate(menu["list"]):
+            fileName = fileInfo[0]
+            chapterTitle = fileInfo[1]
+            filePath = dest + path + fileName + ".html"
+            if idx > 0:
+                lastChapter = menu["list"][idx - 1]
+                lastChapterFileName = lastChapter[0]
+                lastChapterTitle = "上一章：" + lastChapter[1]
+                lastAction = "onclick=\"toChapter('%s')\"" % (lastChapterFileName + ".html",)
+            else:
+                lastChapterTitle = "已经是第一章"
+                lastAction = "disabled"
+            if idx < chapterLength - 1:
+                nextChapter = menu["list"][idx + 1]
+                nextChapterFileName = nextChapter[0]
+                nextChapterTitle = "下一章：" + nextChapter[1]
+                nextAction = "onclick=\"toChapter('%s')\"" % (nextChapterFileName + ".html",)
+            else:
+                nextChapterTitle = "已经是最后一章"
+                nextAction = "disabled"
+
+            with open(filePath, "r", encoding="utf-8") as f:
+                s = f.read()
+            s = s.replace("{{laction}}", lastAction).replace("{{ltitle}}", lastChapterTitle)
+            s = s.replace("{{naction}}", nextAction).replace("{{ntitle}}", nextChapterTitle)
+            with open(filePath, "w", encoding="utf-8") as f:
+                f.write(s)
+
     return menuList
 
 def genMenu(menuList):

@@ -39,6 +39,21 @@
         <div id="content" class="mdui-typo">
             {{content}}
         </div>
+        <div style="height: 5vh;"></div>
+        <div id="chapter-link" class="mdui-row">
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-left" {{laction}}>
+                    <i class="mdui-icon material-icons">chevron_left</i>
+                    {{ltitle}}
+                </button>
+            </div>
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-right" {{naction}}>
+                    {{ntitle}}
+                    <i class="mdui-icon material-icons">chevron_right</i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="footer" style="padding: 2rem 0;">
@@ -55,6 +70,13 @@
     <script>
         function comingSoon() {
             mdui.snackbar("敬请期待");
+        }
+
+        function toChapter(path) {
+            pathList = window.location.href.split("/");
+            pathList.pop();
+            path = pathList.join("/") + "/" + path;
+            window.location.href = path;
         }
 
         function formatContent(node) {

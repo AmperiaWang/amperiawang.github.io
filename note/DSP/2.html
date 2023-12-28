@@ -373,6 +373,21 @@ cv2.imwrite(&quot;out.jpg&quot;, 20 * np.log(np.abs(fftshifted)))
 <p>（3）计算$Y(k)=H(k)X(k)$；</p>
 <p>（4）对$Y(k)$进行IFFT，得到所需的序列$y(n)=(h*x)(n)$。</p>
         </div>
+        <div style="height: 5vh;"></div>
+        <div id="chapter-link" class="mdui-row">
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-left" onclick="toChapter('1.html')">
+                    <i class="mdui-icon material-icons">chevron_left</i>
+                    上一章：1 傅里叶变换、拉普拉斯变换和z变换
+                </button>
+            </div>
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-right" onclick="toChapter('3.html')">
+                    下一章：3 滤波器
+                    <i class="mdui-icon material-icons">chevron_right</i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="footer" style="padding: 2rem 0;">
@@ -389,6 +404,13 @@ cv2.imwrite(&quot;out.jpg&quot;, 20 * np.log(np.abs(fftshifted)))
     <script>
         function comingSoon() {
             mdui.snackbar("敬请期待");
+        }
+
+        function toChapter(path) {
+            pathList = window.location.href.split("/");
+            pathList.pop();
+            path = pathList.join("/") + "/" + path;
+            window.location.href = path;
         }
 
         function formatContent(node) {

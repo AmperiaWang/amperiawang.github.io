@@ -52,6 +52,21 @@
 <p>而IIR滤波器不仅要考虑过往时刻的输入，也要考虑过往时刻的输出。IIR滤波器可被如下方程表示：</p>
 <p>$$y(n)=\sum_{k=0}^{M}{a_{k}x(n-k)}-\sum_{k=1}^{N}{b_{k}y(n-k)}$$</p>
         </div>
+        <div style="height: 5vh;"></div>
+        <div id="chapter-link" class="mdui-row">
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-left" onclick="toChapter('2.html')">
+                    <i class="mdui-icon material-icons">chevron_left</i>
+                    上一章：2 离散傅里叶变换与快速傅里叶变换
+                </button>
+            </div>
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-right" disabled>
+                    已经是最后一章
+                    <i class="mdui-icon material-icons">chevron_right</i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="footer" style="padding: 2rem 0;">
@@ -68,6 +83,13 @@
     <script>
         function comingSoon() {
             mdui.snackbar("敬请期待");
+        }
+
+        function toChapter(path) {
+            pathList = window.location.href.split("/");
+            pathList.pop();
+            path = pathList.join("/") + "/" + path;
+            window.location.href = path;
         }
 
         function formatContent(node) {

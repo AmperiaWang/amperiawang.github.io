@@ -473,6 +473,21 @@
 <p>对于任何以时间为自变量的函数$x(t)$，不论其是否为周期函数，都可以通过傅里叶变换将其在时域和频域之间相互转换。傅里叶变换满足许多性质，而其中最重要的一点是，时域上的卷积操作可被转化为频域上的乘积操作，这点在拉普拉斯变换和z变换中也同样适用。对于傅里叶变换$X(j\Omega )=\mathcal{F}[x(t)]$，其频域上的自变量为$j\Omega $，为纯虚数；将其扩展到整个复数域$s$，便成为拉普拉斯变换$X(s)=\mathcal{L}[x(t)]$。拉普拉斯变换在分析连续系统的传递函数等方面有着十分广泛的应用。</p>
 <p>使用采样操作，可以将连续的函数$x(t)$变为离散的序列$x(n)$，此时可以对序列进行离散时间傅里叶变换$X(e^{j\omega })=\mathcal{F}[x(n)]$，得到离散序列$x(n)$的频域表达式。其在频域上的自变量为$e^{j\omega }$，将其扩展至整个复数域$z$，便成为z变换$X(z)=\mathcal{Z}[x(n)]$。z变换在分析离散系统的传递函数等方面有着十分广泛的应用。</p>
         </div>
+        <div style="height: 5vh;"></div>
+        <div id="chapter-link" class="mdui-row">
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-left" disabled>
+                    <i class="mdui-icon material-icons">chevron_left</i>
+                    已经是第一章
+                </button>
+            </div>
+            <div class="mdui-col-xs-6">
+                <button class="mdui-btn mdui-ripple mdui-float-right" onclick="toChapter('2.html')">
+                    下一章：2 离散傅里叶变换与快速傅里叶变换
+                    <i class="mdui-icon material-icons">chevron_right</i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="footer" style="padding: 2rem 0;">
@@ -489,6 +504,13 @@
     <script>
         function comingSoon() {
             mdui.snackbar("敬请期待");
+        }
+
+        function toChapter(path) {
+            pathList = window.location.href.split("/");
+            pathList.pop();
+            path = pathList.join("/") + "/" + path;
+            window.location.href = path;
         }
 
         function formatContent(node) {
