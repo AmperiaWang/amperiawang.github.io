@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <img class="page-background" src="./assets/images/background.jpg">
+    <img class="page-background" src="./assets/images/background.jpg" alt="">
     <div class="card-bar"></div>
     <div class="card-stage">
         <div class="card-symbol"></div>
@@ -41,9 +41,9 @@
     <script>
         var class_bar, card_bar, background_desc, card_symbol, card_image, card_desc;
 
-        var card_bar_img_template = '<img class="card-icon" src="{{src}}" title="{{title}}" onclick="select_card({{id}});">',
-            card_img_template = '<img class="card-image {{reversed}}" src="{{src}}" onclick="highlight_card(this);" data-class="{{class}}" data-idx="{{id}}">',
-            card_class_img_template = '<div class="card-class" onclick="switch_class({{id}});" title="{{name}}"><img src="./assets/images/{{folder}}.png" alt="{{name}}"/></div>';
+        var card_bar_img_template = '<img class="card-icon" src="{{src}}" alt="{{title}}" title="{{title}}" onclick="select_card({{id}});">',
+            card_img_template = '<img class="card-image {{reversed}}" src="{{src}}" alt="{{title}}" onclick="highlight_card(this);" data-class="{{class}}" data-idx="{{id}}">',
+            card_class_img_template = '<div class="card-class" onclick="switch_class({{id}});" title="{{name}}"><img src="./assets/images/icons/{{folder}}.png" alt="{{name}}"/></div>';
 
         var current_selected_class = 0,
             current_selected_cards = [],
@@ -58,7 +58,11 @@
             var class_info = card_info[current_selected_class],
                 card = class_info["cards"][card_idx];
             current_selected_cards.push($(card_img_template.replace(
-                /{{src}}/g, "./assets/images/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
+                /{{src}}/g, "./assets/images/cards/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
+            ).replace(
+                /{{title}}/g, card["name"]
+            ).replace(
+                /{{reversed}}/g, ""
             ).replace(
                 /{{highlighted}}/g, ""
             ).replace(
@@ -72,7 +76,11 @@
             var class_info = card_info[current_selected_class],
                 card = class_info["cards"][card_idx];
             current_selected_cards[current_highlighted_card] = $(card_img_template.replace(
-                /{{src}}/g, "./assets/images/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
+                /{{src}}/g, "./assets/images/cards/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
+            ).replace(
+                /{{title}}/g, card["name"]
+            ).replace(
+                /{{reversed}}/g, ""
             ).replace(
                 /{{highlighted}}/g, "highlighted"
             ).replace(
@@ -112,7 +120,7 @@
             var card_bar_html = "";
             class_info["cards"].forEach(function (card, idx) {
                 card_bar_html += card_bar_img_template.replace(
-                    /{{src}}/g, "./assets/images/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
+                    /{{src}}/g, "./assets/images/cards_thumbnail/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
                 ).replace(
                     /{{title}}/g, card["name"]
                 ).replace(
