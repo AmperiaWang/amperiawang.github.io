@@ -2,7 +2,19 @@
 
 ## switch_cuda.sh
 
-由于饱受cuda环境设置困扰，从网上扒下了这一段代码，写成sh文件放在这里，使用方法为：
+由于饱受cuda环境设置困扰，从网上扒下了这一段代码，写成sh文件放在这里：
+
+```sh
+function switch_cuda {
+   v=$1
+   export PATH=/usr/local/cuda-$v/bin:$PATH
+   export CUDADIR=/usr/local/cuda-$v
+   export CUDA_HOME=/usr/local/cuda-$v
+   export LD_LIBRARY_PATH=/usr/local/cuda-$v/lib64:$LD_LIBRARY_PATH
+}
+```
+
+使用方法为：
 
 （1）将`switch_cuda.sh`放在某个目录下，这里以主目录`~`为例。
 

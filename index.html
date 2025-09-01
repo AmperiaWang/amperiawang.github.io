@@ -3,6 +3,7 @@
 
 <head>
     <title>欢迎来到我的站点</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
         integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
@@ -118,43 +119,11 @@
         </div>
         <div id="note">
             <div class="mdui-panel" mdui-panel>
-                
-    <div class="mdui-panel-item">
-        <div class="mdui-panel-item-header">
-            <i class="mdui-icon material-icons">book</i>
-            数字信号处理
-        </div>
-        <div class="mdui-panel-item-body">
-            <div class="mdui-list" data-path="DSP/">
-            
-    <a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="1" onclick="openNote(this);">1 傅里叶变换、拉普拉斯变换和z变换</a>
-    
-    <a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="2" onclick="openNote(this);">2 离散傅里叶变换与快速傅里叶变换</a>
-    
-    <a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="3" onclick="openNote(this);">3 滤波器</a>
-    
+                <div class="mdui-panel-item"><div class="mdui-panel-item-header"><i class="mdui-icon material-icons">book</i>数字信号处理</div><div class="mdui-panel-item-body"><div class="mdui-list" data-path="note/DSP"><a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="1" onclick="openNote(this);">1 傅里叶变换、拉普拉斯变换和z变换</a><a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="2" onclick="openNote(this);">2 离散傅里叶变换与快速傅里叶变换</a><a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="3" onclick="openNote(this);">3 滤波器</a></div></div></div><div class="mdui-panel-item"><div class="mdui-panel-item-header"><i class="mdui-icon material-icons">book</i>当前研究内容</div><div class="mdui-panel-item-body"><div class="mdui-list" data-path="note/SNN"><a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="1" onclick="openNote(this);">1 脉冲神经元模型</a></div></div></div><div class="mdui-panel-item"><div class="mdui-panel-item-header"><i class="mdui-icon material-icons">book</i>小工具</div><div class="mdui-panel-item-body"><div class="mdui-list" data-path="note/utils"><a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="README" onclick="openNote(this);">小工具</a></div></div></div>
             </div>
         </div>
     </div>
-    
-    <div class="mdui-panel-item">
-        <div class="mdui-panel-item-header">
-            <i class="mdui-icon material-icons">book</i>
-            当前研究内容
-        </div>
-        <div class="mdui-panel-item-body">
-            <div class="mdui-list" data-path="SNN/">
-            
-    <a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="1" onclick="openNote(this);">1 脉冲神经元模型</a>
-    
-            </div>
-        </div>
-    </div>
-    
-            </div>
-        </div>
-    </div>
-    <div id="appbar-tab" class="mdui-tab mdui-bottom-nav">
+    <div id="appbar-tab" class="mdui-tab mdui-bottom-nav" style="background-color: #ffffff;">
         <a href="#navigator" class="mdui-ripple">
             <i class="mdui-icon material-icons mdui-center">apps</i>
             <label>个人简介</label>
@@ -177,7 +146,9 @@
         }
 
         function openNote(el) {
-            var href = "/note/" + el.parentElement.attributes["data-path"].value + el.attributes["data-path"].value + ".html";
+            var path = el.parentElement.attributes["data-path"].value;
+            var chapter = el.attributes["data-path"].value;
+            var href = path + (path[-1] != "/" ? "/" : "") + chapter + ".html";
             window.location.href = href;
         }
 

@@ -3,6 +3,7 @@
 
 <head>
     <title>欢迎来到我的站点</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
         integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
@@ -122,7 +123,7 @@
             </div>
         </div>
     </div>
-    <div id="appbar-tab" class="mdui-tab mdui-bottom-nav">
+    <div id="appbar-tab" class="mdui-tab mdui-bottom-nav" style="background-color: #ffffff;">
         <a href="#navigator" class="mdui-ripple">
             <i class="mdui-icon material-icons mdui-center">apps</i>
             <label>个人简介</label>
@@ -145,7 +146,9 @@
         }
 
         function openNote(el) {
-            var href = "/note/" + el.parentElement.attributes["data-path"].value + el.attributes["data-path"].value + ".html";
+            var path = el.parentElement.attributes["data-path"].value;
+            var chapter = el.attributes["data-path"].value;
+            var href = path + (path[-1] != "/" ? "/" : "") + chapter + ".html";
             window.location.href = href;
         }
 

@@ -2,7 +2,8 @@
 <html>
 
 <head>
-    <title>{{title}}</title>
+    <title>小工具</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
         integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
@@ -15,7 +16,7 @@
             <a href="/" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '主页'}">
                 <i class="mdui-icon material-icons">home</i>
             </a>
-            <a href="javascript:void(0);" class="mdui-typo-title">{{title}}</a>
+            <a href="javascript:void(0);" class="mdui-typo-title">小工具</a>
             <div class="mdui-toolbar-spacer"></div>
             <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '搜索'}">
                 <i class="mdui-icon material-icons">search</i>
@@ -30,26 +31,50 @@
     </div>
 
     <div class="banner" style="position: relative; width: 100%; height: 30vh;">
-        <img src="{{cover}}" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+        <img src="/assets/homepage_banner.jpg" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
         <div class="cover" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);">
         </div>
     </div>
 
     <div class="mdui-container" style="padding: 2rem 0;">
         <div id="content" class="mdui-typo">
-            {{content}}
+            <h1 id="_1">小工具</h1>
+<h2 id="switch_cudash">switch_cuda.sh</h2>
+<p>由于饱受cuda环境设置困扰，从网上扒下了这一段代码，写成sh文件放在这里：</p>
+<pre><code class="language-sh">function switch_cuda {
+   v=$1
+   export PATH=/usr/local/cuda-$v/bin:$PATH
+   export CUDADIR=/usr/local/cuda-$v
+   export CUDA_HOME=/usr/local/cuda-$v
+   export LD_LIBRARY_PATH=/usr/local/cuda-$v/lib64:$LD_LIBRARY_PATH
+}
+</code></pre>
+<p>使用方法为：</p>
+<p>（1）将<code>switch_cuda.sh</code>放在某个目录下，这里以主目录<code>~</code>为例。</p>
+<p>（2）使用<code>vim</code>开主目录的<code>.bashrc</code>文件：</p>
+<pre><code class="language-sh">sudo apt install vim
+sudo vim ~/.bashrc
+</code></pre>
+<p>（3）按<code>i</code>进入编辑模式后，跳到文件末尾，加上这两行（以<code>cuda</code>版本为<code>11.7</code>为例）：</p>
+<pre><code class="language-sh">source ~/switch_cuda.sh
+switch_cuda 11.7
+</code></pre>
+<p>之后按<code>esc</code>进入命令行模式后输入<code>:wq</code>保存并退出。</p>
+<p>（4）关闭当前窗口，当再次打开命令行时，<code>.bashrc</code>会自动生效。若需要在当前窗口生效，可以输入：</p>
+<pre><code class="language-sh">source ~/.bashrc
+</code></pre>
         </div>
         <div style="height: 5vh;"></div>
         <div id="chapter-link" class="mdui-row">
             <div class="mdui-col-xs-6">
-                <button class="mdui-btn mdui-ripple mdui-float-left" {{laction}}>
+                <button class="mdui-btn mdui-ripple mdui-float-left" disabled>
                     <i class="mdui-icon material-icons">chevron_left</i>
-                    {{ltitle}}
+                    -
                 </button>
             </div>
             <div class="mdui-col-xs-6">
-                <button class="mdui-btn mdui-ripple mdui-float-right" {{naction}}>
-                    {{ntitle}}
+                <button class="mdui-btn mdui-ripple mdui-float-right" disabled>
+                    -
                     <i class="mdui-icon material-icons">chevron_right</i>
                 </button>
             </div>

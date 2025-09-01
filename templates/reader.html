@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>3 滤波器</title>
+    <title>{{title}}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
@@ -16,7 +16,7 @@
             <a href="/" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '主页'}">
                 <i class="mdui-icon material-icons">home</i>
             </a>
-            <a href="javascript:void(0);" class="mdui-typo-title">3 滤波器</a>
+            <a href="javascript:void(0);" class="mdui-typo-title">{{title}}</a>
             <div class="mdui-toolbar-spacer"></div>
             <a href="javascript:comingSoon();" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '搜索'}">
                 <i class="mdui-icon material-icons">search</i>
@@ -31,39 +31,26 @@
     </div>
 
     <div class="banner" style="position: relative; width: 100%; height: 30vh;">
-        <img src="/assets/homepage_banner.jpg" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+        <img src="{{cover}}" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
         <div class="cover" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);">
         </div>
     </div>
 
     <div class="mdui-container" style="padding: 2rem 0;">
         <div id="content" class="mdui-typo">
-            <h1 id="3">3 滤波器</h1>
-<h2 id="31">3.1 数字滤波器基本介绍</h2>
-<p>前一节中简要讲述了如何使用快速傅里叶变换加上遮罩实现一个简易的滤波器。这一节中主要讲述的是更详细的滤波器设计：FIR滤波器和IIR滤波器。由卷积定理我们知道：</p>
-<p>$$y(n)=(h*x)(n)⇔Y(e^{j\omega })=H(e^{j\omega })X(e^{j\omega })$$</p>
-<p>即</p>
-<p>$$H(e^{j\omega })=\frac{Y(e^{j\omega })}{X(e^{j\omega })}$$</p>
-<p>称$H(e^{j\omega })$为滤波器的<strong>频率响应</strong>。</p>
-<p>传统的滤波器可以分为高通（只允许高频信号通过）、低通（只允许低频信号通过）、带通（只允许特定频率信号通过）、带阻（除了特定频率信号都能通过）四种，现代的滤波器有卡尔曼滤波器等。</p>
-<p>数字滤波器可以被总结为如下方程：</p>
-<p>$$\sum_{k=0}^{N}{b_{k}y(n-k)}=\sum_{k=0}^{M}{a_{k}x(n-k)}$$</p>
-<p>其中根据方程式左边$y(n-k)$的个数，可以将滤波器分为<strong>FIR滤波器</strong>和<strong>IIR滤波器</strong>两种。FIR滤波器是非递归式的，当$k∈[1,N-1]$时，$y(n-k)=0$，即当前的输出仅考虑过往时刻的输入。FIR滤波器可被如下方程表示：</p>
-<p>$$y(n)=\sum_{k=0}^{M}{a_{k}x(n-k)}$$</p>
-<p>而IIR滤波器不仅要考虑过往时刻的输入，也要考虑过往时刻的输出。IIR滤波器可被如下方程表示：</p>
-<p>$$y(n)=\sum_{k=0}^{M}{a_{k}x(n-k)}-\sum_{k=1}^{N}{b_{k}y(n-k)}$$</p>
+            {{content}}
         </div>
         <div style="height: 5vh;"></div>
         <div id="chapter-link" class="mdui-row">
             <div class="mdui-col-xs-6">
-                <button class="mdui-btn mdui-ripple mdui-float-left" onclick="toChapter('2.html')">
+                <button class="mdui-btn mdui-ripple mdui-float-left" {{laction}}>
                     <i class="mdui-icon material-icons">chevron_left</i>
-                    2 离散傅里叶变换与快速傅里叶变换
+                    {{ltitle}}
                 </button>
             </div>
             <div class="mdui-col-xs-6">
-                <button class="mdui-btn mdui-ripple mdui-float-right" disabled>
-                    -
+                <button class="mdui-btn mdui-ripple mdui-float-right" {{naction}}>
+                    {{ntitle}}
                     <i class="mdui-icon material-icons">chevron_right</i>
                 </button>
             </div>

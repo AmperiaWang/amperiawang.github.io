@@ -4,15 +4,29 @@ import sys
 import re
 import json
 import markdown
-import string
 import shutil
+from typing import Any, List, Tuple, Iterable, Dict, Mapping, Callable, Union, Optional
+
 
 class Menu:
     path = ""
     title = ""
     list = []
 
-def formulaEscape(formula):
+
+class Chapter:
+    fname: str = ""
+    title: str = ""
+    content: str = ""
+    prev: 'Chapter' = None
+    next: 'Chapter' = None
+    def __init__(self, fname: str, title: str, content: str) -> None:
+        self.fname = fname
+        self.title = title
+        self.content = content
+
+
+def formula_escape(formula: str) -> str:
     table = {
         "α": "\\alpha", "β": "\\beta", "Γ": "\\Gamma", "γ": "\\gamma",
         "Δ": "\\Delta", "δ": "\\delta", "ε": "\\varepsilon", "ζ": "\\zeta",
@@ -29,7 +43,8 @@ def formulaEscape(formula):
         formula = formula.replace(alphabet, table[alphabet] + " ")
     return formula
 
-def createNote(data, template):
+
+def create_note(data: str, template: str) -> Tuple[str, str]:
     formula = re.findall(r"\$\$?[^$]+\$\$?", data)
     for f in range(len(formula)):
         data = data.replace(formula[f], "{{$%d}}" % (f,))
@@ -37,10 +52,16 @@ def createNote(data, template):
     cover = "/assets/homepage_banner.jpg"
     if coverRes is not None:
         cover = coverRes.group(1)
-    content = markdown.markdown(data, extensions=[
-                                "markdown.extensions.toc", "markdown.extensions.fenced_code", "markdown.extensions.tables"])
+    content = markdown.markdown(
+        data,
+        extensions = [
+            "markdown.extensions.toc",
+            "markdown.extensions.fenced_code",
+            "markdown.extensions.tables"
+        ]
+    )
     for f in range(len(formula)):
-        content = content.replace("{{$%d}}" % (f,), formulaEscape(formula[f]))
+        content = content.replace("{{$%d}}" % (f,), formula_escape(formula[f]))
     titleRes = re.search(r">([^<]+)<", content)
     title = ""
     if titleRes is not None:
@@ -49,107 +70,90 @@ def createNote(data, template):
     return res, title
 
 
-def convert(source, dest, path, template):
-    subPathList = os.listdir(source + path)
-    menuList = []
-    menu = {"list": []}
-    menu["path"] = path
-    for fileName in subPathList:
-        if os.path.isfile(source + path + fileName):
-            if fileName.startswith("__") or fileName.startswith("$") or fileName.startswith("~"):
-                continue
-            elif fileName.endswith(".md"):
-                with open(source + path + fileName, "r", encoding="utf-8") as f:
-                    s, title = createNote(f.read(), template)
-                    menu["list"].append([fileName.replace(".md", ""), title])
-                with open(dest + path + fileName.replace(".md", ".html"), "w", encoding="utf-8") as f:
-                    f.write(s)
-            else:
-                if fileName == "title.txt":
-                    with open(source + path + fileName, "r", encoding="utf-8") as f:
-                        menu["title"] = f.read()
-                else:
-                    shutil.copyfile(source + path + fileName, dest + path + fileName)
-        elif os.path.isdir(source + path + fileName):
-            os.mkdir(dest + path + fileName)
-            menuList = menuList + convert(source, dest, path + fileName + "/", template)
-    chapterLength = len(menu["list"])
-    if chapterLength:
-        menuList.append(menu)
-        for idx, fileInfo in enumerate(menu["list"]):
-            fileName = fileInfo[0]
-            chapterTitle = fileInfo[1]
-            filePath = dest + path + fileName + ".html"
-            if idx > 0:
-                lastChapter = menu["list"][idx - 1]
-                lastChapterFileName = lastChapter[0]
-                lastChapterTitle = "上一章：" + lastChapter[1]
-                lastAction = "onclick=\"toChapter('%s')\"" % (lastChapterFileName + ".html",)
-            else:
-                lastChapterTitle = "已经是第一章"
-                lastAction = "disabled"
-            if idx < chapterLength - 1:
-                nextChapter = menu["list"][idx + 1]
-                nextChapterFileName = nextChapter[0]
-                nextChapterTitle = "下一章：" + nextChapter[1]
-                nextAction = "onclick=\"toChapter('%s')\"" % (nextChapterFileName + ".html",)
-            else:
-                nextChapterTitle = "已经是最后一章"
-                nextAction = "disabled"
+def page_btn(chapters: List[Chapter]) -> List[Chapter]:
+    chapter_len = len(chapters)
+    action = lambda fname: "onclick=\"toChapter('%s')\"" % (fname + ".html",)
+    for idx, chapter in enumerate(chapters):
+        content = chapter.content
 
-            with open(filePath, "r", encoding="utf-8") as f:
-                s = f.read()
-            s = s.replace("{{laction}}", lastAction).replace("{{ltitle}}", lastChapterTitle)
-            s = s.replace("{{naction}}", nextAction).replace("{{ntitle}}", nextChapterTitle)
-            with open(filePath, "w", encoding="utf-8") as f:
-                f.write(s)
+        is_first = (idx == 0)
+        if not is_first:
+            left_action = action(chapters[idx - 1].fname)
+            left_title = chapters[idx - 1].title
+        else:
+            left_action = "disabled"
+            left_title = "-"
+        content = content.replace("{{laction}}", left_action).replace("{{ltitle}}", left_title)
 
-    return menuList
+        is_last = (idx == chapter_len - 1)
+        if not is_last:
+            right_action = action(chapters[idx + 1].fname)
+            right_title = chapters[idx + 1].title
+        else:
+            right_action = "disabled"
+            right_title = "-"
+        content = content.replace("{{naction}}", right_action).replace("{{ntitle}}", right_title)
 
-def genMenu(menuList):
-    big_template = """
-    <div class="mdui-panel-item">
-        <div class="mdui-panel-item-header">
-            <i class="mdui-icon material-icons">book</i>
-            {{$1}}
-        </div>
-        <div class="mdui-panel-item-body">
-            <div class="mdui-list" data-path="{{$2}}">
-            {{$3}}
-            </div>
-        </div>
-    </div>
-    """
-    small_template = """
-    <a href="javascript:void(0);" class="mdui-list-item mdui-ripple" data-path="{{$1}}" onclick="openNote(this);">{{$2}}</a>
-    """
-    res = ""
-    for i in menuList:
-        s = ""
-        for j in i["list"]:
-            s += small_template.replace("{{$1}}", j[0]).replace("{{$2}}", j[1])
-        res += big_template.replace("{{$1}}", i["title"]).replace("{{$2}}", i["path"]).replace("{{$3}}", s)
+        chapter.content = content
+    
+    return chapters
+
+
+def homepage_menu(path: str, title: str, chapters: List[Chapter], templates: Dict[str, str]) -> str:
+    menu_items = ""
+    for chapter in chapters:
+        menu_item = templates["menu_item"].replace("{{fname}}", chapter.fname).replace("{{title}}", chapter.title)
+        menu_items += menu_item
+    res = templates["menu"].replace("{{path}}", path).replace("{{title}}", title).replace("{{chapters}}", menu_items)
     return res
 
+
 if __name__ == "__main__":
-    argList = sys.argv
-    source_path = "./note_source/"
-    dest_path = "./note/"
-    template_file = "./reader.html"
-    homepage_template_file = "./index_template.html"
-    if len(argList) >= 2:
-        source_path = argList[1]
-    if len(argList) >= 3:
-        dest_path = argList[2]
-    if len(argList) >= 4:
-        template_file = argList[3]
-    with open(template_file, "r", encoding="utf-8") as f:
-        template = f.read()
-    shutil.rmtree(dest_path)
-    os.mkdir(dest_path)
-    menuList = convert(source_path, dest_path, "", template)
-    with open(homepage_template_file, "r", encoding="utf-8") as f:
-        homepage_template = f.read()
-    homepage = homepage_template.replace("{{menu}}", genMenu(menuList))
-    with open("./index.html", "w", encoding="utf-8") as f:
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", type = str, default = "config.json", help = "Config file.")
+    args = parser.parse_args()
+    with open(args.c, "r", encoding = "utf-8") as f:
+        config = json.load(f)
+    sources = config["sources"]
+    templates = config["templates"]
+    for key, template in templates.items():
+        if os.path.isfile(template):
+            with open(template, "r", encoding = "utf-8") as f:
+                templates[key] = f.read()
+    
+    menu = ""
+    for source in sources:
+        source_path = source["path"]
+        dest_path = source["dest"]
+        title = source["title"]
+        if os.path.isfile(source_path): # 如果源是文件
+            pass
+        elif os.path.isdir(source_path): # 如果源是目录
+            if os.path.isdir(dest_path):
+                shutil.rmtree(dest_path)
+            os.makedirs(dest_path, exist_ok = True)
+            fnames = sorted(os.listdir(source_path), key = lambda x: int((lambda s: s if len(s) else '-1')(''.join(filter(str.isdigit, x)))))
+            chapters = []
+            
+            for fname in fnames:
+                src = os.path.join(source_path, fname)
+                dest = os.path.join(dest_path, fname)
+                if os.path.isdir(src) and src.endswith("assets"): # 资源文件夹
+                    shutil.copytree(src, dest)
+                if os.path.isfile(src) and src.endswith(".md"): # 笔记
+                    with open(src, "r", encoding = "utf-8") as f:
+                        chapter_content, chapter_title = create_note(f.read(), templates["reader"])
+                        chapters.append(Chapter(fname.replace(".md", ""), chapter_title, chapter_content))
+            
+            chapters = page_btn(chapters)
+
+            for chapter in chapters:
+                with open(os.path.join(dest_path, chapter.fname + ".html"), "w", encoding = "utf-8") as f:
+                    f.write(chapter.content)
+        
+        menu += homepage_menu(dest_path, title, chapters, templates)
+
+    homepage = templates["index"].replace("{{menu}}", menu)
+    with open("index.html", "w", encoding = "utf-8") as f:
         f.write(homepage)
