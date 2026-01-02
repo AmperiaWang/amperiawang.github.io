@@ -9,7 +9,6 @@
 	<link rel="icon" href="./favicon.png" type="image/x-icon">
 	<link rel="shortcut icon" href="./favicon.png" type="image/x-icon">
     <link href="./assets/main.css" rel="stylesheet" type="text/css">
-    <script src="./assets/card_info.js"></script>
 </head>
 
 <body>
@@ -42,9 +41,9 @@
                 <img :class="'card-image' + (current_card['reversed'] ? ' reversed' : '')" :src="'./assets/images/cards_thumbnail/' + classes[current_card['class']]['folder'] + '/' + current_card['img'] + '.jpg'" :alt="current_card['title']" @click="highlight_card(current_card['class'], current_card['idx']);">
             </div>
             <div class="card-info">
-                <div class="card-title">{{current_card['title']}}</div>
+                <div class="card-title">{{current_card['title'] + (current_card['reversed'] ? ' 逆位' : '')}}</div>
                 <div class="card-title-english">{{current_card['title_en']}}</div>
-                <div class="card-desc">{{current_card['desc']}}</div>
+                <div class="card-desc">{{current_card['annotations'][current_card['reversed'] ? 'reversed' : 'normal']}}</div>
             </div>
         </div>
         <div class="card-class-bar-container">
@@ -56,6 +55,7 @@
         </div>
     </div>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="./assets/card_info.js"></script>
     <script>
         const { createApp, ref, onMounted } = Vue;
         
@@ -80,6 +80,7 @@
                         "desc": card["keywords"].join(" "),
                         "title_4": card["title"],
                         "symbol": card["symbol"],
+                        "annotations": card["annotations"],
                         "reversed": false
                     };
                 };
