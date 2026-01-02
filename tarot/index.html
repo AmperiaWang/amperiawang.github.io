@@ -3,164 +3,109 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
     <title>塔罗牌</title>
-	<link rel="icon" href="./favicon.png" type="image/x-icon" />
-	<link rel="shortcut icon" href="./favicon.png" type="image/x-icon"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" href="./favicon.png" type="image/x-icon">
+	<link rel="shortcut icon" href="./favicon.png" type="image/x-icon">
     <link href="./assets/main.css" rel="stylesheet" type="text/css">
     <script src="./assets/card_info.js"></script>
 </head>
 
 <body>
-    <img class="page-background" src="./assets/images/background.jpg" alt="">
-    <div class="card-bar"></div>
-    <div class="card-stage">
-        <div class="card-symbol"></div>
-        <div class="card-background-description">
-            <div class="row">
-                <div id="desc-1" class="col background-desc"></div>
-                <div id="desc-2" class="col background-desc"></div>
+    <div id="app">
+        <img class="page-background" src="./assets/images/background.jpg" alt="">
+        <div class="card-bar">
+            <img v-for="(card, idx) in classes[current_class_idx]['cards']" class="card-icon" :src="'./assets/images/cards_thumbnail/' + classes[current_class_idx]['folder'] + '/' + card['image_file'] + '.jpg'" :alt="card['name']" :title="card['name']" @click="select_card(idx);">
+        </div>
+        <div class="card-stage">
+            <div class="card-symbol">{{current_card["symbol"]}}</div>
+            <div class="card-background-description">
+                <div class="row">
+                    <div v-if="current_card['title_4'].length >= 1" id="desc-1" class="col background-desc">
+                        {{current_card['title_4'][0]}}
+                    </div>
+                    <div v-if="current_card['title_4'].length >= 2" id="desc-2" class="col background-desc">
+                        {{current_card['title_4'][1]}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div v-if="current_card['title_4'].length >= 3" id="desc-3" class="col background-desc">
+                        {{current_card['title_4'][2]}}
+                    </div>
+                    <div v-if="current_card['title_4'].length >= 4" id="desc-4" class="col background-desc">
+                        {{current_card['title_4'][3]}}
+                    </div>
+                </div>
             </div>
-            <div class="row">
-                <div id="desc-3" class="col background-desc"></div>
-                <div id="desc-4" class="col background-desc"></div>
+            <div class="card-image-container">
+                <img :class="'card-image' + (current_card['reversed'] ? ' reversed' : '')" :src="'./assets/images/cards_thumbnail/' + classes[current_card['class']]['folder'] + '/' + current_card['img'] + '.jpg'" :alt="current_card['title']" @click="highlight_card(current_card['class'], current_card['idx']);">
+            </div>
+            <div class="card-info">
+                <div class="card-title">{{current_card['title']}}</div>
+                <div class="card-title-english">{{current_card['title_en']}}</div>
+                <div class="card-desc">{{current_card['desc']}}</div>
             </div>
         </div>
-        <div class="card-image-container">
-        </div>
-        <div class="card-info">
-            <div class="card-title"></div>
-            <div class="card-title-english"></div>
-            <div class="card-desc"></div>
+        <div class="card-class-bar-container">
+            <div class="card-class-bar">
+                <div v-for="(card_class, idx) in classes" class="card-class" @click="switch_class(idx);" :title="card_class['name']">
+                    <img :src="'./assets/images/icons/' + card_class['folder'] + '.png'" :alt="card_class['name']"/>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="card-class-bar-container">
-        <div class="card-class-bar">
-        </div>
-    </div>
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script>
-        var class_bar, card_bar, background_desc, card_symbol, card_image, card_desc;
-
-        var card_bar_img_template = '<img class="card-icon" src="{{src}}" alt="{{title}}" title="{{title}}" onclick="select_card({{id}});">',
-            card_img_template = '<img class="card-image {{reversed}}" src="{{src}}" alt="{{title}}" onclick="highlight_card(this);" data-class="{{class}}" data-idx="{{id}}">',
-            card_class_img_template = '<div class="card-class" onclick="switch_class({{id}});" title="{{name}}"><img src="./assets/images/icons/{{folder}}.png" alt="{{name}}"/></div>';
-
-        var current_selected_class = 0,
-            current_selected_cards = [],
-            current_highlighted_card = 0;
+        const { createApp, ref, onMounted } = Vue;
         
-        function switch_class(class_idx) {
-            current_selected_class = class_idx;
-            update_display();
-        }
+        const app = createApp({
+            setup: () => {
+                const classes = ref(card_info);
+                const current_class_idx = ref(0);
+                const current_card = ref({});
+                
+                const switch_class = (class_idx) => {
+                    current_class_idx.value = class_idx;
+                };
 
-        function append_card(card_idx) {
-            var class_info = card_info[current_selected_class],
-                card = class_info["cards"][card_idx];
-            current_selected_cards.push($(card_img_template.replace(
-                /{{src}}/g, "./assets/images/cards/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
-            ).replace(
-                /{{title}}/g, card["name"]
-            ).replace(
-                /{{reversed}}/g, ""
-            ).replace(
-                /{{highlighted}}/g, ""
-            ).replace(
-                /{{class}}/g, current_selected_class
-            ).replace(
-                /{{id}}/g, card_idx
-            )));
-        }
+                const select_card = (card_idx) => {
+                    let card = card_info[current_class_idx.value]["cards"][card_idx];
+                    current_card.value = {
+                        "class": current_class_idx.value,
+                        "idx": card_idx,
+                        "title": card["name"],
+                        "title_en": card["name_english"],
+                        "img": card["image_file"],
+                        "desc": card["keywords"].join(" "),
+                        "title_4": card["title"],
+                        "symbol": card["symbol"],
+                        "reversed": false
+                    };
+                };
 
-        function replace_card(card_idx) {
-            var class_info = card_info[current_selected_class],
-                card = class_info["cards"][card_idx];
-            current_selected_cards[current_highlighted_card] = $(card_img_template.replace(
-                /{{src}}/g, "./assets/images/cards/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
-            ).replace(
-                /{{title}}/g, card["name"]
-            ).replace(
-                /{{reversed}}/g, ""
-            ).replace(
-                /{{highlighted}}/g, "highlighted"
-            ).replace(
-                /{{class}}/g, current_selected_class
-            ).replace(
-                /{{id}}/g, card_idx
-            ));
-        }
+                const highlight_card = (class_idx, card_idx) => {
+                    current_card.value["reversed"] = !current_card.value["reversed"];
+                };
 
-        function select_card(card_idx) {
-            if (current_highlighted_card >= 0) {
-                replace_card(card_idx);
-            } else {
-                append_card(card_idx);
+                select_card(0);
+                
+                // onMounted(() => {
+                //     select_card(0);
+                // });
+
+                return {
+                    classes,
+                    current_class_idx,
+                    current_card,
+                    switch_class,
+                    select_card,
+                    highlight_card
+                };
             }
-            update_display();
-        }
-
-        function highlight_card(card_el) {
-            $(card_el).toggleClass("reversed");
-        }
-
-        function update_display() {
-            var class_bar_html = "";
-            card_info.forEach(function(class_info, idx) {
-                class_bar_html += card_class_img_template.replace(
-                    /{{name}}/g, class_info["name"]
-                ).replace(
-                    /{{folder}}/g, class_info["folder"]
-                ).replace(
-                    /{{id}}/g, idx
-                );
-            });
-            class_bar.html(class_bar_html);
-
-            var class_info = card_info[current_selected_class];
-            var card_bar_html = "";
-            class_info["cards"].forEach(function (card, idx) {
-                card_bar_html += card_bar_img_template.replace(
-                    /{{src}}/g, "./assets/images/cards_thumbnail/" + class_info["folder"] + "/" + card["image_file"] + ".jpg"
-                ).replace(
-                    /{{title}}/g, card["name"]
-                ).replace(
-                    /{{id}}/g, idx
-                );
-            });
-            card_bar.html(card_bar_html);
-
-            card_image.html("");
-            current_selected_cards.forEach(function (card_el, idx) {
-                card_image.append(card_el);
-            });
-
-            background_desc.html("");
-            card_symbol.html("");
-            card_desc.children().html("");
-            if (current_selected_cards.length == 1) {
-                var card_el = current_selected_cards[0];
-                var card = card_info[parseInt(card_el.data("class"))]["cards"][parseInt(card_el.data("idx"))];
-                card["title"].forEach(function (chara, idx) {
-                    background_desc.eq(idx).html(chara);
-                });
-                card_symbol.html(card["symbol"]);
-                card_desc.find(".card-title").html(card["name"]);
-                card_desc.find(".card-title-english").html(card["name_english"]);
-                card_desc.find(".card-desc").html(card["keywords"].join("、"));
-            }
-        }
-
-        $(document).ready(function () {
-            class_bar = $(".card-class-bar");
-            card_bar = $(".card-bar");
-            background_desc = $(".background-desc");
-            card_symbol = $(".card-symbol");
-            card_image = $(".card-image-container");
-            card_desc = $(".card-info");
-
-            append_card(0);
-            update_display();
         });
+        
+        app.mount('#app');
     </script>
 </body>
 
