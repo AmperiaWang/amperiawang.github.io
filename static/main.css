@@ -43,3 +43,8 @@
 .katex-html {
   display: none;
 }
+
+p>span:only-child>span.katex {
+    display: flex;
+    justify-content: center;
+}
