@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>阅读器</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<link rel="icon" href="./favicon.jpg" type="image/x-icon">
+	<link rel="shortcut icon" href="./favicon.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.1/dist/css/mdui.min.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/styles/default.min.css">
+    <link rel="stylesheet" href="./static/main.css">
+</head>
+
+<body class="mdui-bottom-nav-fixed mdui-theme-primary-light-green mdui-theme-accent-teal">
+    <div id="app">
+        <div id="appbar" class="mdui-appbar">
+            <div class="mdui-toolbar mdui-color-theme">
+                <a href="/" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '主页'}">
+                    <i class="mdui-icon material-icons">home</i>
+                </a>
+                <a href="javascript:void(0);" class="mdui-typo-title">{{currentNote["title"]}}</a>
+                <div class="mdui-toolbar-spacer"></div>
+                <a class="mdui-btn mdui-btn-icon" @click="" mdui-tooltip="{content: '刷新'}">
+                    <i class="mdui-icon material-icons">refresh</i>
+                </a>
+            </div>
+        </div>
+
+        <div class="banner">
+            <img class="banner-background" :src="!isBannerEmpty() ? currentNote['banner'] : './static/banner.jpg'" :alt="currentNote['title']">
+            <div class="banner-cover"></div>
+        </div>
+
+        <div class="mdui-container" style="padding: 2rem 0;">
+            <div v-if="currentNote['content'].length > 0" id="content" class="mdui-typo" v-html="currentNote['content']"></div>
+            <div v-else class="mdui-text-center">笔记加载中...</div>
+            <div style="height: 5vh;"></div>
+            <div id="chapter-link" class="mdui-row">
+                <div class="mdui-col-xs-6">
+                    <button v-if="prevNote !== null" class="mdui-btn mdui-ripple mdui-float-left" @click="openNote(seriesIdx, noteIdx - 1);">
+                        <i class="mdui-icon material-icons">chevron_left</i>
+                        {{(prevNote !== null) ? prevNote['title'] : ''}}
+                    </button>
+                </div>
+                <div class="mdui-col-xs-6">
+                    <button v-if="nextNote!== null" class="mdui-btn mdui-ripple mdui-float-right" @click="openNote(seriesIdx, noteIdx + 1);">
+                        <i class="mdui-icon material-icons">chevron_right</i>
+                        {{(nextNote !== null) ? nextNote['title'] : ''}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="footer" style="padding: 2rem 0;">
+            <div class="mdui-text-center mdui-text-color-grey">
+                {{(new Date()).getFullYear()}} @{{personalInfo["name"]}}
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/mdui@1.0.1/dist/js/mdui.min.js"></script>
+    <script src="https://unpkg.com/showdown@2.1.0/dist/showdown.js"></script>
+    <script src="https://unpkg.com/showdown-katex@0.8.0/dist/showdown-katex.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/highlight.min.js"></script>
+    <script src="./static/note_menu.js"></script>
+    <script>
+        const { createApp, ref, onMounted, nextTick } = Vue;
+        const params = new URLSearchParams(window.location.search);
+        const converter = new showdown.Converter({
+            tables: true,
+            strikethrough: true,
+            underline: true,
+            extensions: [
+                showdownKatex({
+                    throwOnError: false,
+                    displayMode: false,
+                    delimiters: [
+                        { left: "$$", right: "$$", display: false },
+                        { left: "$", right: "$", display: false },
+                        { left: "~", right: "~", display: false, asciimath: true }
+                    ]
+                })
+            ]
+        });
+        converter.setOption('tables', true);
+        console.log(params.get("sidx"), params.get("nidx"));
+        
+        const app = createApp({
+            setup: () => {
+                const personalInfo = ref({
+                    "name": "安培利亚",
+                    "avatar": "./favicon.jpg",
+                    "homepage": "https://github.com/AmperiaWang"
+                });
+                const seriesIdx = ref(parseInt(params.get("sidx")) || 0);
+                const noteIdx = ref(parseInt(params.get("nidx")) || 0);
+                const seriesNotes = ref(note_menu[seriesIdx.value]["subs"]);
+                const currentNote = ref(Object.assign({}, seriesNotes.value[noteIdx.value], {
+                    "banner": "",
+                    "content": ""
+                }));
+                const prevNote = ref((noteIdx.value > 0) ? seriesNotes.value[noteIdx.value - 1] : null);
+                const nextNote = ref((noteIdx.value < (seriesNotes.value.length - 1)) ? seriesNotes.value[noteIdx.value + 1] : null);
+
+                const setTitle = (text) => {
+                    document.title = text;
+                };
+
+                const comingSoon = () => {
+                    mdui.snackbar("敬请期待");
+                };
+
+                const applyRefresh = () => {
+                    window.location.reload();
+                };
+                
+                const openNote = (series_idx, note_idx) => {
+                    window.open("./reader.html?sidx=" + encodeURIComponent(series_idx) + "&nidx=" + encodeURIComponent(note_idx), "_self");
+                };
+
+                const isBannerEmpty = () => {
+                    return (currentNote.value["banner"] === null) || (currentNote.value["banner"].length === 0);
+                };
+
+                const getNoteContent = () => {
+                    fetch(
+                        "./" + note_menu[seriesIdx.value]["path"] + "/" + currentNote.value["path"]
+                    ).then((res) => {
+                        res.text().then((data) => {
+                            let tempElement = document.createElement("div");
+                            tempElement.innerHTML = converter.makeHtml(data.replaceAll(/(\!\[[^\]]*\])\(\.\/([^)]+)\)/g, ($0, $1, $2) => {
+                                let href = "./" + note_menu[seriesIdx.value]["path"] + "/" + $2;
+                                if (isBannerEmpty()) {
+                                    currentNote.value["banner"] = href;
+                                }
+                                return $1 + "(" + href + ")";
+                            }));
+                            formatContent(tempElement);
+                            console.log(tempElement);
+                            let indices = tempElement.getElementsByClassName("image-index");
+                            for (let idx = 0; idx < indices.length; idx++) {
+                                indices[idx].innerHTML = (idx + 1);
+                            }
+                            currentNote.value["content"] = tempElement.innerHTML;
+                            nextTick(() => {
+                                hljs.highlightAll();
+                            });
+                        });
+                    }).catch((err) => {
+                        console.log(err);
+                    })
+                };
+
+                const formatContent = (node) => {
+                    let len = node.childNodes.length;
+                    if (!len) {
+                        return;
+                    }
+                    for (let idx = 0; idx < len; idx++) {
+                        let el = node.childNodes[idx];
+                        let elTag = el.nodeName.toLowerCase();
+                        if (elTag == "img") {
+                            if (node.className == "mdui-text-center") {
+                                break;
+                            }
+                            node.setAttribute("class", "mdui-text-center");
+                            let imageDescription = document.createElement("div");
+                            imageDescription.setAttribute("class", "description mdui-text-color-grey mdui-typo-caption mdui-text-center");
+                            imageDescription.innerHTML = "图<span class='image-index'></span>&nbsp;&nbsp;" + el.alt;
+                            el.outerHTML = el.outerHTML + imageDescription.outerHTML;
+                            len++;
+                            idx++;
+                        }
+                        if (elTag == "table") {
+                            el.setAttribute("class", "mdui-table");
+                        }
+                        formatContent(el);
+                    }
+                };
+
+                onMounted(() => {
+                    setTitle(currentNote.value["title"]);
+                    getNoteContent();
+                });
+
+                return {
+                    converter,
+                    personalInfo,
+                    seriesIdx,
+                    noteIdx,
+                    currentNote,
+                    prevNote,
+                    nextNote,
+                    setTitle,
+                    comingSoon,
+                    applyRefresh,
+                    openNote,
+                    isBannerEmpty,
+                    getNoteContent,
+                    formatContent
+                };
+            }
+        });
+        
+        app.mount('#app');
+    </script>
+</body>
+
+</html>
