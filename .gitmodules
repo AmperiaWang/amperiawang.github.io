@@ -1,0 +1,6 @@
+[submodule "apps/browser_homepage"]
+	path = apps/browser_homepage
+	url = https://github.com/AmperiaWang/browser_homepage.git
+[submodule "apps/enhanced_layedit"]
+	path = apps/enhanced_layedit
+	url = https://github.com/AmperiaWang/Enhanced-Layedit.git
