@@ -30,6 +30,11 @@
     font-weight: 300;
 }
 
+.appbar-avatar {
+    display: flex;
+    align-items: center;
+}
+
 .appbar-avatar img {
     width: 2.5rem;
     height: 2.5rem;

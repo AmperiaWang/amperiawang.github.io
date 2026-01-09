@@ -19,7 +19,7 @@
                 <a href="/" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '主页'}">
                     <i class="mdui-icon material-icons">home</i>
                 </a>
-                <a href="javascript:void(0);" class="mdui-typo-title">{{currentNote["title"]}}</a>
+                <a href="javascript:void(0);" class="mdui-typo-title" v-html="currentNote['title']"></a>
                 <div class="mdui-toolbar-spacer"></div>
                 <a class="mdui-btn mdui-btn-icon" @click="" mdui-tooltip="{content: '刷新'}">
                     <i class="mdui-icon material-icons">refresh</i>
@@ -40,13 +40,13 @@
                 <div class="mdui-col-xs-6">
                     <button v-if="prevNote !== null" class="mdui-btn mdui-ripple mdui-float-left" @click="openNote(seriesIdx, noteIdx - 1);">
                         <i class="mdui-icon material-icons">chevron_left</i>
-                        {{(prevNote !== null) ? prevNote['title'] : ''}}
+                        <span v-html="(prevNote !== null) ? prevNote['title'] : ''"></span>
                     </button>
                 </div>
                 <div class="mdui-col-xs-6">
                     <button v-if="nextNote!== null" class="mdui-btn mdui-ripple mdui-float-right" @click="openNote(seriesIdx, noteIdx + 1);">
                         <i class="mdui-icon material-icons">chevron_right</i>
-                        {{(nextNote !== null) ? nextNote['title'] : ''}}
+                        <span v-html="(nextNote !== null) ? nextNote['title'] : ''"></span>
                     </button>
                 </div>
             </div>
@@ -54,7 +54,8 @@
 
         <div id="footer" style="padding: 2rem 0;">
             <div class="mdui-text-center mdui-text-color-grey">
-                {{(new Date()).getFullYear()}} @{{personalInfo["name"]}}
+                <span v-html="(new Date()).getFullYear()"></span>
+                <span v-html="'@' + personalInfo['name']"></span>
             </div>
         </div>
     </div>
@@ -65,7 +66,7 @@
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/highlight.min.js"></script>
     <script src="./static/note_menu.js"></script>
     <script>
-        const { createApp, ref, onMounted, nextTick } = Vue;
+        const { createApp, ref, onMounted, onUpdated, nextTick } = Vue;
         const params = new URLSearchParams(window.location.search);
         const converter = new showdown.Converter({
             tables: true,
@@ -143,9 +144,6 @@
                                 indices[idx].innerHTML = (idx + 1);
                             }
                             currentNote.value["content"] = tempElement.innerHTML;
-                            nextTick(() => {
-                                hljs.highlightAll();
-                            });
                         });
                     }).catch((err) => {
                         console.log(err);
@@ -182,6 +180,11 @@
                 onMounted(() => {
                     setTitle(currentNote.value["title"]);
                     getNoteContent();
+                });
+
+                onUpdated(() => {
+                    mdui.mutation();
+                    hljs.highlightAll();
                 });
 
                 return {

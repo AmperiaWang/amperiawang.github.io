@@ -18,32 +18,24 @@
             <img v-for="(card, idx) in classes[current_class_idx]['cards']" class="card-icon" :src="'./assets/images/cards_thumbnail/' + classes[current_class_idx]['folder'] + '/' + card['image_file'] + '.jpg'" :alt="card['name']" :title="card['name']" @click="select_card(idx);">
         </div>
         <div class="card-stage">
-            <div class="card-symbol">{{current_card["symbol"]}}</div>
+            <div class="card-symbol" v-html="current_card['symbol']"></div>
             <div class="card-background-description">
                 <div class="row">
-                    <div v-if="current_card['title_4'].length >= 1" id="desc-1" class="col background-desc">
-                        {{current_card['title_4'][0]}}
-                    </div>
-                    <div v-if="current_card['title_4'].length >= 2" id="desc-2" class="col background-desc">
-                        {{current_card['title_4'][1]}}
-                    </div>
+                    <div v-if="current_card['title_4'].length >= 1" id="desc-1" class="col background-desc" v-html="current_card['title_4'][0]"></div>
+                    <div v-if="current_card['title_4'].length >= 2" id="desc-2" class="col background-desc" v-html="current_card['title_4'][1]"></div>
                 </div>
                 <div class="row">
-                    <div v-if="current_card['title_4'].length >= 3" id="desc-3" class="col background-desc">
-                        {{current_card['title_4'][2]}}
-                    </div>
-                    <div v-if="current_card['title_4'].length >= 4" id="desc-4" class="col background-desc">
-                        {{current_card['title_4'][3]}}
-                    </div>
+                    <div v-if="current_card['title_4'].length >= 3" id="desc-3" class="col background-desc" v-html="current_card['title_4'][2]"></div>
+                    <div v-if="current_card['title_4'].length >= 4" id="desc-4" class="col background-desc" v-html="current_card['title_4'][3]"></div>
                 </div>
             </div>
             <div class="card-image-container">
                 <img :class="'card-image' + (current_card['reversed'] ? ' reversed' : '')" :src="'./assets/images/cards_thumbnail/' + classes[current_card['class']]['folder'] + '/' + current_card['img'] + '.jpg'" :alt="current_card['title']" @click="highlight_card(current_card['class'], current_card['idx']);">
             </div>
             <div class="card-info">
-                <div class="card-title">{{current_card['title'] + (current_card['reversed'] ? ' 逆位' : '')}}</div>
-                <div class="card-title-english">{{current_card['title_en']}}</div>
-                <div class="card-desc">{{current_card['annotations'][current_card['reversed'] ? 'reversed' : 'normal']}}</div>
+                <div class="card-title" v-html="current_card['title'] + (current_card['reversed'] ? ' 逆位' : '')"></div>
+                <div class="card-title-english" v-html="current_card['title_en']"></div>
+                <div class="card-desc" v-html="current_card['annotations'][current_card['reversed'] ? 'reversed' : 'normal']"></div>
             </div>
         </div>
         <div class="card-class-bar-container">
