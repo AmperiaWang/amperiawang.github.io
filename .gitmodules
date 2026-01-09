@@ -4,3 +4,6 @@
 [submodule "app/enhanced_layedit"]
 	path = app/enhanced_layedit
 	url = https://github.com/AmperiaWang/Enhanced-Layedit.git
+[submodule "app/notiverse"]
+	path = app/notiverse
+	url = https://github.com/AmperiaWang/notiverse.git
