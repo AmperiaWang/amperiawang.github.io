@@ -18,6 +18,16 @@ const note_menu = [
         ]
     },
     {
+        "title": "PyTorch基础",
+        "path": "note/PyTorch",
+        "subs": [
+            {
+                "title": "1 张量",
+                "path": "1.md"
+            }
+        ]
+    },
+    {
         "title": "当前研究内容",
         "path": "note/SNN",
         "subs": [
