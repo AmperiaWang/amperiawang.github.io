@@ -8,7 +8,7 @@
 	<link rel="icon" href="./favicon.jpg" type="image/x-icon">
 	<link rel="shortcut icon" href="./favicon.jpg" type="image/x-icon">
     <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.1/dist/css/mdui.min.css"/>
-    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/styles/default.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/styles/github.min.css">
     <link rel="stylesheet" href="./static/main.css">
 </head>
 
@@ -178,11 +178,12 @@
                 };
 
                 onMounted(() => {
-                    setTitle(currentNote.value["title"]);
+                    setTitle(currentNote.value["title"] + " - " + personalInfo.value["name"]);
                     getNoteContent();
                 });
 
                 onUpdated(() => {
+                    setTitle(currentNote.value["title"] + " - " + personalInfo.value["name"]);
                     mdui.mutation();
                     hljs.highlightAll();
                 });
